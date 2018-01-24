@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import subprocess
 import sys
+import os
 import asyncio
 
 import discord
@@ -33,6 +34,14 @@ class Core:
         else:
             await self.bot.say(':white_check_mark: Reloaded cog `{}`'.format(cog))
             print('[LOAD] Reloaded cog `{}`'.format(cog))
+
+    @commands.command(aliases=['reboot'])
+    async def restart(self):
+        """Restarts the bot.
+        
+        Developer only command."""
+        await self.bot.say(':warning: Rebooting Lilac...')
+        os.execl(sys.executable, sys.executable, * sys.argv)
 
     @commands.command(aliases=['pgit'])
     @is_cleared()

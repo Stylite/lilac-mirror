@@ -4,6 +4,7 @@ import discord
 from cogs.util.checks import manage_usrs
 
 class Mod:
+    """Moderation Commands"""
     def __init__(self, bot):
         self.bot = bot
 
@@ -28,9 +29,9 @@ class Mod:
     @commands.command(pass_context=True)
     @manage_usrs()
     async def kick(self, ctx, *, mention: str):
-        """Bans a user. 
+        """Kicks a user. 
         
-        You must provide a mention for the bot to ban."""
+        You must provide a mention for the bot to kick."""
         to_kick = None
         if ctx.message.mentions:
             to_kick = ctx.message.mentions[0]
