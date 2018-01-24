@@ -25,6 +25,24 @@ class Mod:
         await self.bot.say(':white_check_mark: Successfully banned user {}#{}'\
                             .format(to_ban.name, to_ban.discriminator))
 
+    @commands.command(pass_context=True)
+    @manage_usrs()
+    async def kick(self, ctx, *, mention: str):
+        """Bans a user. 
+        
+        You must provide a mention for the bot to ban."""
+        to_kick = None
+        if ctx.message.mentions:
+            to_kick = ctx.message.mentions[0]
+        else:
+            await self.bot.say(':warning: You did not mention a user to kick.')
+            return
+
+        await self.bot.send_message(to_kick, 'You have been kicked from {}'.format(ctx.message.server.name))
+        await self.bot.kick(to_kick)
+        await self.bot.say(':white_check_mark: Successfully kicked user {}#{}'\
+                            .format(to_kick.name, to_kick.discriminator))
+
 
 def setup(bot):
     bot.add_cog(Mod(bot))
