@@ -23,7 +23,7 @@ class Lilac(commands.Bot):
         err = traceback.format_exception(type(exception), exception, exception.__traceback__, chain=False)
         err = '\n'.join(err)
 
-        await self.bot.say(':warning: An error occured: \n ```{}```'.format(str(exception)))
+        await self.send_message(ctx.message.channel, ':warning: An error occured: ```{}```'.format(str(exception)))
         print('[ERR] Error:')
         print(err)
 
