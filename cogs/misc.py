@@ -17,7 +17,9 @@ class Misc:
             cats.sort()
             for cat in cats:
                 cat_cmds = self.bot.get_cog_commands(cat)
-                send.add_field(name=cat, value=len(cat_cmds), inline=True)
+                send.add_field(name=cat, value='{} commands'.format(str(len(cat_cmds))), \
+                                inline=True)
+                
 
         await self.bot.say(embed=send)
                 
