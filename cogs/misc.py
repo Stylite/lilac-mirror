@@ -23,4 +23,5 @@ class Misc:
                 
 
 def setup(bot):
+    bot.remove_command('help')
     bot.add_cog(Misc(bot))
