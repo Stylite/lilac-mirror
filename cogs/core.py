@@ -42,6 +42,7 @@ class Core:
         Developer only command."""
         await self.bot.say(':warning: Rebooting Lilac...')
         os.execl(sys.executable, sys.executable, * sys.argv)
+        await self.bot.say(':white_check_mark: Done rebooting!')
 
     @commands.command(aliases=['pgit'])
     @is_cleared()
