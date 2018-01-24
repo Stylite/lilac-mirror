@@ -8,7 +8,7 @@ class Misc:
         self.bot = bot
 
     @commands.command()
-    async def help(self, *args):
+    async def help(self, ctx, *args):
         send = discord.Embed()
         if len(args) == 0:
             send.title = "Lilac Help"
@@ -21,7 +21,7 @@ class Misc:
                                 inline=True)
                 
 
-        await self.bot.say(embed=send)
+        await ctx.send(embed=send)
                 
 
 def setup(bot):

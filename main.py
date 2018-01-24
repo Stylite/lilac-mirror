@@ -19,11 +19,11 @@ class Lilac(commands.Bot):
         print('[INFO] Lilac is ready!')
         print('[INFO] Logged in as {}#{}'.format(self.user.name, self.user.discriminator))
 
-    async def on_command_error(self, exception, ctx):
+    async def on_command_error(self, ctx, exception):
         err = traceback.format_exception(type(exception), exception, exception.__traceback__, chain=False)
         err = '\n'.join(err)
 
-        await self.send_message(ctx.message.channel, ':warning: An error occured: ```{}```'.format(str(exception)))
+        await ctx.send(':warning: An error occured: ```{}```'.format(str(exception)))
         print('[ERR] Error:')
         print(err)
 
