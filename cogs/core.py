@@ -1,7 +1,10 @@
 #!/usr/bin/env python
+import subprocess
+import sys
 from discord.ext import commands
-from cogs.util.checks import is_cleared
 import discord
+import asyncio
+from cogs.util.checks import is_cleared
 
 class Core:
     def __init__(self, bot):
@@ -26,6 +29,30 @@ class Core:
         else:
             await self.bot.say(':white_check_mark: Reloaded cog `{}`'.format(cog))
             print('[LOAD] Reloaded cog `{}`'.format(cog))
+
+    @commands.command(aliases=['pgit'])
+    @is_cleared()
+    async def pull(self):
+        """Pulls from Git."""
+        await self.bot.say(':warning: Pulling from Git! This will overwrite all local changes!')
+
+        output = []
+        if sys.platform == 'win32':
+            fetch_process = subprocess.run('git fetch --all', stdout=subprocess.PIPE)
+            reset_process = subprocess.run('git reset --hard origin/master', stdout=subprocess.PIPE)
+            output = [fetch_process.stdout, reset_process.stdout]
+        else:
+            fetch_process = await asyncio.create_subprocess_exec('git', 'fetch', '--all', \
+                                                                    stdout=subprocess.PIPE)
+            reset_process = await asyncio.create_subprocess_exec('git', 'reset', '--hard', \
+                                                    'origin/master', stdout=subprocess.PIPE)
+            output = [fetch_process.stdout, reset_process.stdout]
+        
+        output[0] = '\n'.join(output[0].decode().splitlines())
+        output[1] = '\n'.join(output[1].decode().splitlines())
+        await self.bot.say('Git Response: ```{}``` ```{}```'.format(output[0], output[1]))
+
+
 
 def setup(bot):
     bot.add_cog(Core(bot))
