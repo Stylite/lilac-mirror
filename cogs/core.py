@@ -27,3 +27,6 @@ class Core:
             await self.bot.say(':white_check_mark: Reloaded cog `{}`'.format(cog))
             print('[LOAD] Reloaded cog `{}`'.format(cog))
 
+def setup(bot):
+    bot.add_cog(Core(bot))
+
