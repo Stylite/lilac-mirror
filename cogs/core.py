@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 import subprocess
 import sys
-from discord.ext import commands
-import discord
 import asyncio
+
+import discord
+from discord.ext import commands
+
 from cogs.util.checks import is_cleared
 
 class Core:
@@ -18,7 +20,9 @@ class Core:
     @commands.command()
     @is_cleared()
     async def reload(self, *, cog):
-        """Reloads a cog of the bot. Developer only."""
+        """Reloads a cog of the bot. 
+        
+        Developer only command."""
         try:
             self.bot.unload_extension(cog)
             self.bot.load_extension(cog)
@@ -33,7 +37,11 @@ class Core:
     @commands.command(aliases=['pgit'])
     @is_cleared()
     async def pull(self):
-        """Pulls from Git."""
+        """Pulls from Git.
+        
+        Developer only command.
+        This will pull code from Git, effectively overwriting
+        all local changes not pushed to Git."""
         await self.bot.say(':warning: Pulling from Git! This will overwrite all local changes!')
 
         output = []
@@ -50,8 +58,7 @@ class Core:
         
         output[0] = '\n'.join(output[0].decode().splitlines())
         output[1] = '\n'.join(output[1].decode().splitlines())
-        await self.bot.say('Git Response: ```{}``` ```{}```'.format(output[0], output[1]))
-
+        await self.bot.say('**Git Response:** ```{}``````{}```'.format(output[0], output[1]))
 
 
 def setup(bot):
