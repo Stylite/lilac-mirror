@@ -69,7 +69,7 @@ class Mod:
         yaml.dump(self.bot.welcomes, open('data/welcomes.yml', 'w'))
 
         await ctx.send(':white_check_mark: Set your welcome channel to {}'\
-                    .format(self.bot.welcomes[ctx.message.guild.id][0].name))
+                    .format(ctx.message.channel_mentions[0]))
 
 
 def setup(bot):
