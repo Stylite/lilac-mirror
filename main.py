@@ -18,10 +18,12 @@ class Lilac(commands.Bot):
         )
 
     async def on_ready(self):
+        """Function executes once bot is ready."""
         print('[INFO] Lilac is ready!')
         print('[INFO] Logged in as {}#{}'.format(self.user.name, self.user.discriminator))
 
     async def on_command_error(self, ctx, exception):
+        """Function executes once bot encounters an error"""
         err = traceback.format_exception(type(exception), exception, exception.__traceback__, chain=False)
         err = '\n'.join(err)
 
@@ -30,6 +32,7 @@ class Lilac(commands.Bot):
         print(err)
 
     async def on_member_join(self, member):
+        """Function executes once a member joins a guild."""
         if member.guild.id in self.welcomes:
             welcome_config = self.welcomes[member.guild.id]
 
@@ -44,6 +47,7 @@ class Lilac(commands.Bot):
 
 
     def run(self):
+        """Run function for Lilac. Loads cogs and runs the bot."""
         cogs = self.config['cogs']
 
         for cog in cogs:

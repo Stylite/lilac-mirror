@@ -28,7 +28,7 @@ class Core:
             self.bot.unload_extension(cog)
             self.bot.load_extension(cog)
         except Exception as e:
-            await ctx.send(':warning: Failed to reload cog `{}`'.format(cog))
+            await ctx.send(':warning: Failed to reload cog `{}`, because:```{}```'.format(cog, str(e)))
             print('[LOAD] Failed to reload cog `{}`, because: '.format(cog))
             print(e)
         else:
