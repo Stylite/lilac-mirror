@@ -13,7 +13,7 @@ def is_cleared():
 
 def manage_usrs():
     def predicate(ctx: commands.Context):
-        user_perms = ctx.message.author.server_permissions
+        user_perms = ctx.message.author.guild_permissions
         if user_perms.ban_members and user_perms.kick_members:
             return True
         return False
