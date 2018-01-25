@@ -39,7 +39,7 @@ class Mod:
             await ctx.send(':warning: You did not mention a user to kick.')
             return
 
-        await ctx.message.kick(to_kick)
+        await ctx.message.guild.kick(to_kick)
         await ctx.send(':white_check_mark: Successfully kicked user {}#{}'\
                             .format(to_kick.name, to_kick.discriminator))
 
