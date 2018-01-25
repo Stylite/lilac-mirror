@@ -20,7 +20,7 @@ class Mod:
             to_ban = ctx.message.mentions[0]
         else:
             await ctx.send(':warning: You did not mention a user to ban.')
-            return
+             return
 
         await ctx.message.guild.ban(to_ban)
         await ctx.send(':white_check_mark: Successfully banned user {}#{}'\
@@ -45,23 +45,31 @@ class Mod:
 
     @commands.command()
     @manage_guild()
-    async def setwelcome(self, ctx, *, welcome_message: str):
+    async def welcome(self, ctx, *, welcome_message: str):
         """Sets the welcome message for user joins.
         
         To mention the user joined in your welcome message, use
         %mention%."""
-        self.bot.welcomes[ctx.message.guild.id] = [None, welcome_message]
+        
+        if ctx.message.guild.id not in self.bot.welcomes:
+            self.bot.welcomes[ctx.message.guild.id] = [None, None]
+
+        self.bot.welcomes[ctx.message.guild.id][1] = welcome_message
         yaml.dump(self.bot.welcomes, open('data/welcomes.yml', 'w'))
 
         await ctx.send(':white_check_mark: Set the welcome message for this guild. Please set' +\
-                ' the welcome message channel next, using the `setwelcomechannel` command.')
+                ' the welcome message channel next, using the `welcomechannel` command.')
 
     @commands.command(aliases=['welcomechannel', 'welcomechnl'])
     @manage_guild()
-    async def setwelcomechannel(self, ctx, *, channel_mention: str):
+    async def welcomechannel(self, ctx, *, channel_mention: str):
         """Sets the welcome channel for user join messages.
         
         You must mention the channel."""
+        if ctx.message.guild.id not in self.bot.welcomes:
+            await ctx.send(':warning: You need to set a welcome message before setting the '+\
+                             'welcome channel.')
+            return
         if len(ctx.message.channel_mentions) == 0:
             await ctx.send(':warning: You have not provided a channel mention for your welcome channel.')
             return

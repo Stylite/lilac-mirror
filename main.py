@@ -40,7 +40,7 @@ class Lilac(commands.Bot):
                 return
 
             fmt_welcome_message = welcome_config[1].replace('%mention%', member.mention)
-            welcome_channel.send(fmt_welcome_message)
+            await welcome_channel.send(fmt_welcome_message)
 
 
     def run(self):
