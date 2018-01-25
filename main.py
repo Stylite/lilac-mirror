@@ -6,9 +6,11 @@ import discord
 
 class Lilac(commands.Bot):
     def __init__(self):
-        self.config = {}
+        self.config, self.welcomes = {}, {}
         with open('config.yml', 'r') as config:
             self.config = yaml.load(config)
+        with open('data/welcomes.yml') as welcomes:
+            self.welcomes = yaml.load(welcomes)
 
         super().__init__(
             command_prefix='l!',
