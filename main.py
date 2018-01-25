@@ -29,6 +29,20 @@ class Lilac(commands.Bot):
         print('[ERR] Error:')
         print(err)
 
+    async def on_member_join(self, member):
+        if member.guild.id in self.welcomes:
+            welcome_config = self.welcomes[member.guild.id]
+
+            welcome_channel = None
+            if welcome_config[0] is not None:
+                welcome_channel = member.guild.get_channel(welcome_config[0])
+            else:
+                return
+
+            fmt_welcome_message = welcome_config[1].replace('%mention%', member.mention)
+            welcome_channel.send(fmt_welcome_message)
+
+
     def run(self):
         cogs = self.config['cogs']
 

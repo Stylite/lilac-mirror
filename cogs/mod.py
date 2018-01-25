@@ -49,7 +49,7 @@ class Mod:
         """Sets the welcome message for user joins.
         
         To mention the user joined in your welcome message, use
-        %user%."""
+        %mention%."""
         self.bot.welcomes[ctx.message.guild.id] = [None, welcome_message]
         yaml.dump(self.bot.welcomes, open('data/welcomes.yml', 'w'))
 
@@ -65,7 +65,7 @@ class Mod:
         if len(ctx.message.channel_mentions) == 0:
             await ctx.send(':warning: You have not provided a channel mention for your welcome channel.')
             return
-        self.bot.welcomes[ctx.message.guild.id][0] = ctx.message.channel_mentions[0]
+        self.bot.welcomes[ctx.message.guild.id][0] = ctx.message.channel_mentions[0].id
         yaml.dump(self.bot.welcomes, open('data/welcomes.yml', 'w'))
 
         await ctx.send(':white_check_mark: Set your welcome channel to {}'\
