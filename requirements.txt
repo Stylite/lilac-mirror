@@ -1,2 +1,2 @@
-discord.py==0.16.11
+git+https://github.com/Rapptz/discord.py@rewrite
 PyYaml
