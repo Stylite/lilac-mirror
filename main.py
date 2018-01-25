@@ -14,7 +14,7 @@ class Lilac(commands.Bot):
 
         super().__init__(
             command_prefix='l!',
-            description='A bot made for Ethan J. Campbell\'s Lilac Discord server.'
+            description='A bot made for moderation, fun, and verifying KnowYourMeme accounts with Discord.'
         )
 
     async def on_ready(self):
