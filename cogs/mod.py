@@ -2,7 +2,7 @@
 from discord.ext import commands
 import discord
 import yaml
-from cogs.util.checks import manage_usrs, manage_guild
+from cogs.util.checks import manage_usrs, manage_guild, manage_roles
 
 
 class Mod:
@@ -81,6 +81,46 @@ class Mod:
         await ctx.send(':white_check_mark: Set your welcome channel to {}'
                        .format(ctx.message.channel_mentions[0]))
 
+    @commands.command()
+    @manage_roles()
+    async def autorole(self, ctx, action: str, role_name: str):{
+        """Creates/removes autoroles.
+        
+        To create an autorole, do `l!autorole add <role-name>`.
+        To remove an autorole, do `l!autorole remove <role-name>`"""
+        if action.lower() == 'add':
+            to_add = None
+            for role in ctx.message.guild.roles:
+                if role_name.lower() == role.name.lower():
+                    to_add = role
+                    break
+            else:
+                await ctx.send(f':warning: Role `{role_name}` not found.')
+                return
+
+            if ctx.message.guild.id in self.bot.autoroles:
+                self.bot.autoroles[ctx.message.guild.id].append(to_add.id)
+            else:
+                self.bot.autoroles[ctx.message.guild.id] = [to_add.id]
+            yaml.dump(self.bot.autoroles, open('data/autoroles.yml'))
+            await ctx.send(f':white_check_mark: Role `{to_add.name}` added to autoroles.')
+
+        elif action.lower() == 'remove':
+            to_remove = None 
+            for role in ctx.message.guild.roles:
+                if role_name.lower() == role.name.lower():
+                    to_remove = role
+                    break
+            else:
+                await ctx.send(f':warning: Role `{role_name}` not found.')
+                return           
+
+            if ctx.message.guild.id in self.bot.autoroles:
+                if to_remove.id in self.bot.autoroles[ctx.message.guild.id]:
+                    self.bot.autoroles.remove(to_remove.id)
+
+        else:
+            await ctx.send(':warning: Invalid action. The valid actions are `add` and `remove`')
 
 def setup(bot):
     bot.add_cog(Mod(bot))

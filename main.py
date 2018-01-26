@@ -6,11 +6,13 @@ import discord
 
 class Lilac(commands.Bot):
     def __init__(self):
-        self.config, self.welcomes = {}, {}
+        self.config, self.welcomes, self.autoroles = {}, {}, {}
         with open('config.yml', 'r') as config:
             self.config = yaml.load(config)
         with open('data/welcomes.yml', 'r') as welcomes:
             self.welcomes = yaml.load(welcomes)
+        with open('data/autoroles.yml', 'r') as autoroles:
+            self.autoroles = yaml.load(autoroles)
 
         super().__init__(
             command_prefix='l!',
