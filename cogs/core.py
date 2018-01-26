@@ -77,7 +77,7 @@ class Core:
             output = [pull_process.stdout, checkout_proc_1.stdout, \
                     checkout_proc_2.stdout, checkout_proc_3.stdout, checkout_proc_4.stdout]
         
-        for out in enumerate(output):
+        for out in len(range(output)):
             output[out] = '\n'.join(output[out].decode().splitlines())
 
         await ctx.send(f'**Git Response:** ```{output[0]}``````{output[1]}```'+\
