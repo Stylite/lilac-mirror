@@ -18,6 +18,9 @@ class Misc:
 
     @commands.command()
     async def help(self, ctx, *args):
+        """Shows the help message.
+        
+        What did you expect?!"""
         send = discord.Embed()
 
         cats = [cog for cog in self.bot.cogs]

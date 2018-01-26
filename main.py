@@ -9,7 +9,7 @@ class Lilac(commands.Bot):
         self.config, self.welcomes = {}, {}
         with open('config.yml', 'r') as config:
             self.config = yaml.load(config)
-        with open('data/welcomes.yml') as welcomes:
+        with open('data/welcomes.yml', 'r') as welcomes:
             self.welcomes = yaml.load(welcomes)
 
         super().__init__(

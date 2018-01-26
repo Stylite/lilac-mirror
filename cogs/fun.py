@@ -11,6 +11,10 @@ class Fun:
         
     @commands.command(aliases=['8ball'])
     async def eightball(self, ctx, *, question: str):
+        """Spins a Magic 8 Ball!
+        
+        Please don't use this command to actually decide real
+        decisions."""
         choices = [
             'It is certain',
             'It is decidedly so',

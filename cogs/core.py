@@ -3,6 +3,7 @@ import subprocess
 import sys
 import os
 import asyncio
+import importlib
 
 import discord
 from discord.ext import commands
@@ -36,6 +37,7 @@ class Core:
             print('[LOAD] Reloaded cog `{}`'.format(cog))
 
     @commands.command(aliases=['reboot'])
+    @is_cleared()
     async def restart(self, ctx):
         """Restarts the bot.
         
@@ -43,6 +45,17 @@ class Core:
         await ctx.send(':warning: Rebooting Lilac...')
         os.execl(sys.executable, sys.executable, * sys.argv)
         await ctx.send(':white_check_mark: Done rebooting!')
+
+    @commands.command(aliases=['evaluate'])
+    @is_cleared()
+    async def debug(self, ctx, *, code: str):
+        try:
+            res = eval(code)
+        except Exception as e:
+            await ctx.send(f'Error: ```{str(e)}```')
+            return
+        else:
+            await ctx.send(f'Execution successful. Result: ```{str(res)}```')
 
     @commands.command(aliases=['pgit'])
     @is_cleared()
