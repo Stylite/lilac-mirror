@@ -56,15 +56,15 @@ class Core:
 
         output = []
         if sys.platform == 'win32':
-            fetch_process = subprocess.run('git pull', stdout=subprocess.PIPE)
+            fetch_process = subprocess.run('git pull origin master', stdout=subprocess.PIPE)
             
             output = fetch_process.stdout
         else:
-            fetch_process = await asyncio.create_subprocess_exec('git', 'pull', \
+            fetch_process = await asyncio.create_subprocess_exec('git', 'pull', 'origin', 'master', \
                                                                     stdout=subprocess.PIPE)
             output = fetch_process.stdout
         
-        output[0] = '\n'.join(output.decode().splitlines())
+        output = '\n'.join(output.decode().splitlines())
         await ctx.send('**Git Response:** ```{}```'.format(output))
 
 
