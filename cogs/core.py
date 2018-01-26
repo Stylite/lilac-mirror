@@ -56,19 +56,15 @@ class Core:
 
         output = []
         if sys.platform == 'win32':
-            fetch_process = subprocess.run('git fetch --all', stdout=subprocess.PIPE)
-            reset_process = subprocess.run('git reset --hard origin/master', stdout=subprocess.PIPE)
-            output = [fetch_process.stdout, reset_process.stdout]
+            pull_process = subprocess.run('git pull origin master', stdout=subprocess.PIPE)
+            output = pull_process.stdout
         else:
-            fetch_process = await asyncio.create_subprocess_exec('git', 'fetch', '--all', \
+            pull_process = await asyncio.create_subprocess_exec('git', 'pull', \
                                                                     stdout=subprocess.PIPE)
-            reset_process = await asyncio.create_subprocess_exec('git', 'reset', '--hard', \
-                                                    'origin/master', stdout=subprocess.PIPE)
-            output = [fetch_process.stdout, reset_process.stdout]
+            output = pull_process.stdout
         
-        output[0] = '\n'.join(output[0].decode().splitlines())
-        output[1] = '\n'.join(output[1].decode().splitlines())
-        await ctx.send('**Git Response:** ```{}``````{}```'.format(output[0], output[1]))
+        output = '\n'.join(output.decode().splitlines())
+        await ctx.send('**Git Response:** ```{}```'.format(output))
 
 
 def setup(bot):
