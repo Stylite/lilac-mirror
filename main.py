@@ -24,7 +24,8 @@ class Lilac(commands.Bot):
 
     async def on_command_error(self, ctx, exception):
         """Function executes once bot encounters an error"""
-        err = traceback.format_exception(type(exception), exception, exception.__traceback__, chain=False)
+        err = traceback.format_exception(type(exception.original), exception.original, \
+                                        exception.original.__traceback__, chain=False)
         err = '\n'.join(err)
 
         await ctx.send(':warning: An error occured: ```{}```'.format(str(exception)))
