@@ -56,15 +56,32 @@ class Core:
 
         output = []
         if sys.platform == 'win32':
-            pull_process = subprocess.run('git pull origin master', stdout=subprocess.PIPE)
-            output = pull_process.stdout
+            pull_process = subprocess.run('git fetch', stdout=subprocess.PIPE)
+            checkout_proc_1 = subprocess.run('git checkout HEAD cogs/', stdout=subprocess.PIPE)
+            checkout_proc_2 = subprocess.run('git checkout HEAD main.py', stdout=subprocess.PIPE)
+            checkout_proc_3 = subprocess.run('git checkout HEAD config.yml', stdout=subprocess.PIPE)
+            checkout_proc_4 = subprocess.run('git checkout HEAD requirements.txt', stdout=subprocess.PIPE)
+            output = [pull_process.stdout, checkout_proc_1.stdout, \
+                    checkout_proc_2.stdout, checkout_proc_3.stdout, checkout_proc_4.stdout]
         else:
-            pull_process = await asyncio.create_subprocess_exec('git', 'pull', \
-                                                                    stdout=subprocess.PIPE)
-            output = pull_process.stdout
+            pull_process = await asyncio.create_subprocess_exec('git', 'fetch', \
+                                                                stdout=subprocess.PIPE)
+            checkout_proc_1 = subprocess.run('git', 'checkout', 'HEAD', 'cogs/', \
+                                            stdout=subprocess.PIPE)
+            checkout_proc_2 = subprocess.run('git', 'checkout', 'HEAD', 'main.py', \
+                                                stdout=subprocess.PIPE)
+            checkout_proc_3 = subprocess.run('git', 'checkout', 'HEAD', 'config.yml', \
+                                            stdout=subprocess.PIPE)
+            checkout_proc_4 = subprocess.run('git', 'checkout', 'HEAD', 'requirements.txt',\
+                                             stdout=subprocess.PIPE)
+            output = [pull_process.stdout, checkout_proc_1.stdout, \
+                    checkout_proc_2.stdout, checkout_proc_3.stdout, checkout_proc_4.stdout]
         
-        output = '\n'.join(output.decode().splitlines())
-        await ctx.send('**Git Response:** ```{}```'.format(output))
+        for out in enumerate(output):
+            output[out] = '\n'.join(output[out].decode().splitlines())
+
+        await ctx.send(f'**Git Response:** ```{output[0]}``````{output[1]}```'+\
+                        f'```{output[2]}``````{output[3]}``````{output[4]}```')
 
 
 def setup(bot):
