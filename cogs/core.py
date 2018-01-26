@@ -55,10 +55,10 @@ class Core:
         try:
             res = eval(code)
         except Exception as e:
-            await ctx.send(f'Error: ```{str(e)}```')
+            await ctx.send(f':warning: Error: ```{str(e)}```')
             return
         else:
-            await ctx.send(f'Execution successful. Result: ```{str(res)}```')
+            await ctx.send(f':white_check_mark: Execution successful. Result: ```{str(res)}```')
 
     @commands.command(aliases=['pgit'])
     @is_cleared()
