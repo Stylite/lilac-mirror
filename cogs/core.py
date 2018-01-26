@@ -49,6 +49,9 @@ class Core:
     @commands.command(aliases=['evaluate'])
     @is_cleared()
     async def debug(self, ctx, *, code: str):
+        """Evaluates some code.
+    
+        Must be an expression."""
         try:
             res = eval(code)
         except Exception as e:
