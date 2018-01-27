@@ -36,6 +36,7 @@ class Lilac(commands.Bot):
 
     async def on_member_join(self, member):
         """Function executes once a member joins a guild."""
+        # handle welcome messages
         if member.guild.id in self.welcomes:
             welcome_config = self.welcomes[member.guild.id]
 
@@ -47,10 +48,11 @@ class Lilac(commands.Bot):
 
             fmt_welcome_message = welcome_config[1].replace('%mention%', member.mention)
             await welcome_channel.send(fmt_welcome_message)
+        # handle autoroles
         if member.guild.id in self.autoroles:
             autoroles = self.autoroles[member.guild.id]
             for role in autoroles:
-                member.add_roles(role)
+                await member.add_roles(role)
 
 
     def run(self):
