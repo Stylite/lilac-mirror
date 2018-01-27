@@ -83,11 +83,12 @@ class Mod:
 
     @commands.command()
     @manage_roles()
-    async def autorole(self, ctx, action: str, role_name: str):{
+    async def autorole(self, ctx, action: str, role_name: str):
         """Creates/removes autoroles.
         
         To create an autorole, do `l!autorole add <role-name>`.
         To remove an autorole, do `l!autorole remove <role-name>`"""
+
         if action.lower() == 'add':
             to_add = None
             for role in ctx.message.guild.roles:
