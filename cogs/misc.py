@@ -22,11 +22,19 @@ class Misc:
         
         What did you expect?!"""
         send = discord.Embed()
+        send.colour = 0xbd8cbf
 
         cats = [cog for cog in self.bot.cogs]
         cats.sort()
+        for cat in cats:
+            if cat == 'Dev' and ctx.message.author.id not in self.bot.config['cleared']:
+                cats.remove('Dev')
+
         all_cmds = []
         for cog in self.bot.cogs:
+            if cog == 'Dev' and ctx.message.author.id not in self.bot.config['cleared']:
+                continue
+
             cmds = self.bot.get_cog_commands(cog)
             all_cmds += cmds
 
