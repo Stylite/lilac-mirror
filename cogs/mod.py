@@ -118,6 +118,14 @@ class Mod:
             if ctx.message.guild.id in self.bot.autoroles:
                 if to_remove.id in self.bot.autoroles[ctx.message.guild.id]:
                     self.bot.autoroles.remove(to_remove.id)
+                else:
+                    await ctx.send(':warning: That role is not an autorole.')
+                    return
+            else:
+                await ctx.send(':warning: You currently do not have any autoroles.')
+                return
+
+            await ctx.send(f':white_check_mark: Removed role `{to_remove.name}` from autoroles.')
 
         else:
             await ctx.send(':warning: Invalid action. The valid actions are `add` and `remove`')

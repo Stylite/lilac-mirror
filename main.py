@@ -47,6 +47,10 @@ class Lilac(commands.Bot):
 
             fmt_welcome_message = welcome_config[1].replace('%mention%', member.mention)
             await welcome_channel.send(fmt_welcome_message)
+        if member.guild.id in self.autoroles:
+            autoroles = self.autoroles[member.guild.id]
+            for role in autoroles:
+                member.add_roles(role)
 
 
     def run(self):
