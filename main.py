@@ -51,8 +51,15 @@ class Lilac(commands.Bot):
         # handle autoroles
         if member.guild.id in self.autoroles:
             autoroles = self.autoroles[member.guild.id]
-            for role in autoroles:
-                await member.add_roles(role)
+            for role_id in autoroles:
+                to_add = None
+                for role in member.guild.roles:
+                    if role.id == role_id:
+                        to_add = role
+                        break
+
+                if to_add:
+                    member.add_roles(to_add)
 
 
     def run(self):
