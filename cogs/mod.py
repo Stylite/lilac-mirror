@@ -59,8 +59,7 @@ class Mod:
         self.bot.welcomes[ctx.message.guild.id][1] = welcome_message
         yaml.dump(self.bot.welcomes, open('data/welcomes.yml', 'w'))
 
-        await ctx.send(':white_check_mark: Set the welcome message for this guild. Please set' +
-                       ' the welcome message channel next, using the `welcomechannel` command.')
+        await ctx.send(':white_check_mark: Set the welcome message for this guild.')
 
     @commands.command(aliases=['welcomechnl'])
     @manage_guild()
@@ -78,7 +77,7 @@ class Mod:
         self.bot.welcomes[ctx.message.guild.id][0] = ctx.message.channel_mentions[0].id
         yaml.dump(self.bot.welcomes, open('data/welcomes.yml', 'w'))
 
-        await ctx.send(':white_check_mark: Set your welcome channel to {}'
+        await ctx.send(':white_check_mark: Set your welcome channel to `{}`'
                        .format(ctx.message.channel_mentions[0]))
 
     @commands.command()
@@ -103,7 +102,7 @@ class Mod:
                 self.bot.autoroles[ctx.message.guild.id].append(to_add.id)
             else:
                 self.bot.autoroles[ctx.message.guild.id] = [to_add.id]
-            yaml.dump(self.bot.autoroles, open('data/autoroles.yml'))
+            yaml.dump(self.bot.autoroles, open('data/autoroles.yml', 'w'))
             await ctx.send(f':white_check_mark: Role `{to_add.name}` added to autoroles.')
 
         elif action.lower() == 'remove':
@@ -127,6 +126,7 @@ class Mod:
                 return
 
             await ctx.send(f':white_check_mark: Removed role `{to_remove.name}` from autoroles.')
+            yaml.dump(self.bot.autoroles, open('data/autoroles.yml', 'w'))
 
         else:
             await ctx.send(':warning: Invalid action. The valid actions are `add` and `remove`')
