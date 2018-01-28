@@ -8,7 +8,7 @@ class Lilac(commands.Bot):
     def __init__(self):
         self.config =  {}
         self.welcomes, self.goodbyes = {}, {}
-        self.autoroles = {}
+        self.autoroles, self.selfroles = {}, {}
         with open('config.yml', 'r') as config:
             self.config = yaml.load(config)
         with open('data/welcomes.yml', 'r') as welcomes:
@@ -17,6 +17,8 @@ class Lilac(commands.Bot):
             self.goodbyes = yaml.load(goodbyes)
         with open('data/autoroles.yml', 'r') as autoroles:
             self.autoroles = yaml.load(autoroles)
+        with open('data/selfroles.yml', 'r') as selfroles:
+            self.selfroles = yaml.load(selfroles)
 
         super().__init__(
             command_prefix='l!',

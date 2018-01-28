@@ -82,7 +82,7 @@ class Mod:
 
     @commands.command()
     @manage_roles()
-    async def autorole(self, ctx, action: str, role_name: str):
+    async def autorole(self, ctx, action: str, *, role_name: str):
         """Creates/removes autoroles.
 
         To create an autorole, do `l!autorole add <role-name>`.
@@ -117,7 +117,7 @@ class Mod:
 
             if ctx.message.guild.id in self.bot.autoroles:
                 if to_remove.id in self.bot.autoroles[ctx.message.guild.id]:
-                    self.bot.autoroles.remove(to_remove.id)
+                    self.bot.autoroles[ctx.message.guild.id].remove(to_remove.id)
                 else:
                     await ctx.send(':warning: That role is not an autorole.')
                     return
@@ -153,14 +153,13 @@ class Mod:
                     role = r
                     break
             autorole_list.append(role.name)
-        
+
         message = 'This guild\'s current autoroles are: ```'
         for autorole in autorole_list:
             message += f'• {autorole}\n'
         message += '```'
-        
-        await ctx.send(message)
 
+        await ctx.send(message)
 
     @commands.command()
     @manage_guild()
@@ -197,6 +196,87 @@ class Mod:
         await ctx.send(':white_check_mark: Set your goodbye channel to `{}`'
                        .format(ctx.message.channel_mentions[0]))
 
+    @commands.command()
+    @manage_roles()
+    async def selfrole(self, ctx, action: str, *, role_name: str):
+        """Creates/removes selfroles (self-assignable roles).
+        
+        To create a selfrole, do `l!selfrole add <role_name>`.
+        To remove a selfrole, do `l!selfrole remove <role_name>`"""
+        if action.lower() == 'add':
+            role = None
+            for r in ctx.message.guild.roles:
+                if r.name.lower() == role_name.lower():
+                    role = r
+                    break
+            else:
+                await ctx.send(f':warning: Role `{role_name}` was not found.')
+                return
+
+            if ctx.message.guild.id in self.bot.selfroles:
+                self.bot.selfroles[ctx.message.guild.id].append(role.id)
+            else:
+                self.bot.selfroles[ctx.message.guild.id] = [role.id]
+
+            yaml.dump(self.bot.selfroles, open('data/selfroles.yml', 'w'))
+            await ctx.send(f':white_check_mark: I have added `{role_name}` to selfroles!')
+
+        elif action.lower() == 'remove':
+            role = None
+            for r in ctx.message.guild.roles:
+                if r.name.lower() == role_name.lower():
+                    role = r
+                    break
+            else:
+                await ctx.send(f':warning: Role `{role_name}` was not found.')
+                return
+
+            if ctx.message.guild.id not in self.bot.selfroles:
+                await ctx.send(f':warning: Your guild does not have any selfroles. ' +
+                               'Thus, I cannot remove a role from the nonexistent selfroles list.')
+                return
+
+            self.bot.selfroles[ctx.message.guild.id].remove(role.id)
+            yaml.dump(self.bot.selfroles, open('data/atuoroles.yml'))
+
+            await ctx.send(f':white_check_mark: Role `{role_name}` was removed from the selfroles!')
+
+        else:
+            await ctx.send(f':warning: That\'s not a valid argument.')
+
+    @commands.command()
+    async def getrole(self, ctx, *, role_name: str):
+        """Gets a selfrole."""
+        role = None
+        for r in ctx.message.guild.roles:
+            if r.name.lower() == role_name.lower():
+                role = r
+                break
+        else:
+            await ctx.send(f':warning: Role `{role_name}` was not found.')
+
+        if ctx.message.guild.id not in self.bot.selfroles:
+            await ctx.send(':warning: That role isn\'t a selfrole -- in fact, this guild '+\
+                            'doesn\'t even have any selfroles.')
+            return
+        
+        if role.id not in self.bot.selfroles[ctx.message.guild.id]:
+            await ctx.send(':warning: That role isn\'t a selfrole.')
+            return
+
+        if role in ctx.message.author.roles:
+            await ctx.send(':warning: You already have that role.')
+            return
+
+        await ctx.message.author.add_roles(role)
+        await ctx.send(f':white_check_mark: **{ctx.message.author.name}**, you now have `{role.name}` role.')
+
+    @commands.command()
+    async def droprole(self, ctx, *, role_name: str):
+        role = None
+        
+
+        
 
 def setup(bot):
     bot.add_cog(Mod(bot))
