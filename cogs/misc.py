@@ -21,6 +21,35 @@ class Misc:
         """Shows the help message.
         
         What did you expect?!"""
+        def cmp_to_key(mycmp):
+            'Convert a cmp= function into a key= function'
+            class K(object):
+                def __init__(self, obj, *args):
+                    self.obj = obj
+                def __lt__(self, other):
+                    return mycmp(self.obj, other.obj) < 0
+                def __gt__(self, other):
+                    return mycmp(self.obj, other.obj) > 0
+                def __eq__(self, other):
+                    return mycmp(self.obj, other.obj) == 0
+                def __le__(self, other):
+                    return mycmp(self.obj, other.obj) <= 0  
+                def __ge__(self, other):
+                    return mycmp(self.obj, other.obj) >= 0
+                def __ne__(self, other):
+                    return mycmp(self.obj, other.obj) != 0
+            return K
+
+        # ^ copied directly from stackoverflow
+
+        def sort_cmd(cmd1, cmd2):
+            if cmd1.name < cmd2.name:
+                return -1
+            elif cmd1.name > cmd2.name:
+                return 1
+            else:
+                return 0
+
         send = discord.Embed()
         send.colour = 0xbd8cbf
 
@@ -52,6 +81,7 @@ class Misc:
                 if cat.lower() == search_term.lower():
                     found[0] = True
                     cat_cmds = self.bot.get_cog_commands(cat)
+                    cat_cmds = sorted(cat_cmds, key=cmp_to_key(sort_cmd))
 
                     send.title = '{} Commands'.format(cat)
                     send.description = 'To get more details about each command, use ' +\
