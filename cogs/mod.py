@@ -165,7 +165,7 @@ class Mod:
     @commands.command()
     @manage_guild()
     async def goodbye(self, ctx, *, goodbye_message: str):
-        """Sets the goodbye message for user joins.
+        """Sets the goodbye message for user leaves.
 
         To use the username of the user who left in your goodbye message, use
         %name%."""
