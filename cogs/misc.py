@@ -11,7 +11,7 @@ class Misc:
         params_string = ''
         params = list(cmd.clean_params.items())
         for param in params:
-            params_string += '<{}>'.format(param[0])
+            params_string += '<{}> '.format(param[0])
         
         return f'{self.bot.command_prefix}{cmd.name} {params_string}' 
 
@@ -43,8 +43,7 @@ class Misc:
             send.description = "To get the commands in each category, use ```l!help <category-name>```"
             for cat in cats:
                 cat_cmds = self.bot.get_cog_commands(cat)
-                send.add_field(name=cat, value='{} commands'.format(str(len(cat_cmds))), \
-                                inline=True)
+                send.add_field(name=cat, value='{} commands'.format(str(len(cat_cmds))), inline=False)
 
         elif len(args) == 1:
             found = [False, False]
@@ -63,7 +62,7 @@ class Misc:
                             cmd.brief = cmd.help.split('\n')[0]
                         if cmd.help is None:
                             cmd.brief = 'No help message found.'
-                        send.add_field(name=cmd.name, value=cmd.brief, inline=True)
+                        send.add_field(name=cmd.name, value=cmd.brief, inline=False)
                     break
             
             for cmd in all_cmds:

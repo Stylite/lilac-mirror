@@ -84,7 +84,7 @@ class Mod:
     @manage_roles()
     async def autorole(self, ctx, action: str, role_name: str):
         """Creates/removes autoroles.
-        
+
         To create an autorole, do `l!autorole add <role-name>`.
         To remove an autorole, do `l!autorole remove <role-name>`"""
 
@@ -106,14 +106,14 @@ class Mod:
             await ctx.send(f':white_check_mark: Role `{to_add.name}` added to autoroles.')
 
         elif action.lower() == 'remove':
-            to_remove = None 
+            to_remove = None
             for role in ctx.message.guild.roles:
                 if role_name.lower() == role.name.lower():
                     to_remove = role
                     break
             else:
                 await ctx.send(f':warning: Role `{role_name}` not found.')
-                return           
+                return
 
             if ctx.message.guild.id in self.bot.autoroles:
                 if to_remove.id in self.bot.autoroles[ctx.message.guild.id]:
@@ -130,6 +130,73 @@ class Mod:
 
         else:
             await ctx.send(':warning: Invalid action. The valid actions are `add` and `remove`')
+
+    @commands.command()
+    @manage_roles()
+    async def autoroles(self, ctx):
+        """Lists current autoroles."""
+        if ctx.message.guild.id not in self.bot.autoroles:
+            await ctx.send(':x: You currently do not have any autoroles.')
+            return
+
+        autorole_id_list = self.bot.autoroles[ctx.message.guild.id]
+
+        if len(autorole_id_list) == 0:
+            await ctx.send(':x: You currently do not have any autoroles.')
+            return
+
+        autorole_list = []
+        for role_id in autorole_id_list:
+            role = None
+            for r in ctx.message.guild.roles:
+                if r.id == role_id:
+                    role = r
+                    break
+            autorole_list.append(role.name)
+        
+        message = 'This guild\'s current autoroles are: ```'
+        for autorole in autorole_list:
+            message += f'• {autorole}\n'
+        message += '```'
+        
+        await ctx.send(message)
+
+
+    @commands.command()
+    @manage_guild()
+    async def goodbye(self, ctx, *, goodbye_message: str):
+        """Sets the goodbye message for user joins.
+
+        To use the username of the user who left in your goodbye message, use
+        %name%."""
+
+        if ctx.message.guild.id not in self.bot.goodbyes:
+            self.bot.goodbyes[ctx.message.guild.id] = [None, None]
+
+        self.bot.goodbyes[ctx.message.guild.id][1] = goodbye_message
+        yaml.dump(self.bot.welcomes, open('data/goodbyes.yml', 'w'))
+
+        await ctx.send(':white_check_mark: Set the goodbye message for this guild.')
+
+    @commands.command(aliases=['goodbyechnl'])
+    @manage_guild()
+    async def goodbyechannel(self, ctx, *, channel_mention: str):
+        """Sets the goodbye channel for user leave messages.
+
+        You must mention the channel."""
+        if ctx.message.guild.id not in self.bot.goodbyes:
+            await ctx.send(':warning: You need to set a goodbye message before setting the ' +
+                           'goodbye channel.')
+            return
+        if len(ctx.message.channel_mentions) == 0:
+            await ctx.send(':warning: You have not provided a channel mention for your goodbye channel.')
+            return
+        self.bot.goodbyes[ctx.message.guild.id][0] = ctx.message.channel_mentions[0].id
+        yaml.dump(self.bot.welcomes, open('data/goodbyes.yml', 'w'))
+
+        await ctx.send(':white_check_mark: Set your goodbye channel to `{}`'
+                       .format(ctx.message.channel_mentions[0]))
+
 
 def setup(bot):
     bot.add_cog(Mod(bot))

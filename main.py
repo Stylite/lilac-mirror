@@ -6,11 +6,15 @@ import discord
 
 class Lilac(commands.Bot):
     def __init__(self):
-        self.config, self.welcomes, self.autoroles = {}, {}, {}
+        self.config =  {}
+        self.welcomes, self.goodbyes = {}, {}
+        self.autoroles = {}
         with open('config.yml', 'r') as config:
             self.config = yaml.load(config)
         with open('data/welcomes.yml', 'r') as welcomes:
             self.welcomes = yaml.load(welcomes)
+        with open('data/goodbyes.yml', 'r') as goodbyes:
+            self.goodbyes = yaml.load(goodbyes)
         with open('data/autoroles.yml', 'r') as autoroles:
             self.autoroles = yaml.load(autoroles)
 
@@ -64,6 +68,19 @@ class Lilac(commands.Bot):
 
                 if to_add:
                     await member.add_roles(to_add)
+
+    async def on_member_remove(self, member):
+        if member.guild.id in self.goodbyes:
+            goodbye_config = self.goodbyes[member.guild.id]
+
+            goodbye_channel = None
+            if goodbye_config[0] is not None:
+                goodbye_channel = member.guild.get_channel(goodbye_config[0])
+            else:
+                return
+
+            fmt_goodbye_message = goodbye_config[1].replace('%name%', member.name)
+            await goodbye_channel.send(fmt_goodbye_message)
 
 
     def run(self):
