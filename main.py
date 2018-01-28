@@ -32,16 +32,27 @@ class Lilac(commands.Bot):
 
     async def on_command_error(self, ctx, exception):
         """Function executes once bot encounters an error"""
-        if isinstance(exception, commands.CommandInvokeError):
-            exception = exception.original
-
         err = traceback.format_exception(type(exception), exception, \
                                             exception.__traceback__, chain=False)
         err = '\n'.join(err)
+        if isinstance(exception, commands.CommandInvokeError):
+            exception = exception.original
+            if isinstance(exception, discord.Forbidden):
+                await ctx.send(':warning: I don\'t have enough perms to do that.')
+            else:
+                await ctx.send(f':warning: CommandInvokeError: `{err}` This should never happen, '+\
+                                'please report this to one of the developers.')
+        elif isinstance(exception, commands.errors.MissingRequiredArgument):
+            fmt_error = ''.join(exception.args)
+            await ctx.send(f':warning: {fmt_error}')
+        elif isinstance(exception, commands.CommandNotFound):
+            await ctx.send(':warning: Command not found.')
+        elif isinstance(exception, commands.errors.CheckFailure):
+            await ctx.send(':warning: You don\'t have enough perms to perform that action.')
+        else:
+            await ctx.send(f':warning: An error occured! ```{err}``` This should never happen;'+\
+                            ' please report this to one of the developers.')
 
-        await ctx.send(':warning: An error occured: ```{}```'.format(str(exception)))
-        print('[ERR] Error:')
-        print(err)
 
     async def on_member_join(self, member):
         """Function executes once a member joins a guild."""
