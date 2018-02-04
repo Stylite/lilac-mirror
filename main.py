@@ -6,7 +6,7 @@ import discord
 
 class Lilac(commands.Bot):
     def __init__(self):
-        self.config =  {}
+        self.config = {}
         self.welcomes, self.goodbyes = {}, {}
         self.autoroles, self.selfroles = {}, {}
         with open('config.yml', 'r') as config:
