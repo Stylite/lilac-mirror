@@ -40,7 +40,7 @@ class DevNotif:
             self.notif_type = notif_type
 
         self.guild, self.channel, self.user = guild, channel, user
-        self.time = time.strftime('%d/%m/%Y %T PST')
+        self.time = time.strftime('%d/%m/%Y %T PST', time)
 
     def format_into_embed(self):
         """Formats the DevNotif into an embed, and returns it.
