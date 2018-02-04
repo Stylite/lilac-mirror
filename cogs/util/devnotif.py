@@ -55,7 +55,7 @@ class DevNotif:
             embed.colour = 0x2fef00
 
         embed.title = 'Notification (Thing Occured!):'
-        embed.set_author(name=f'From: `{self.user.name}#{self.user.discriminator} [{self.user.id}]`')
+        embed.set_author(name=f'From: {self.user.name}#{self.user.discriminator} [{self.user.id}]')
 
         embed.add_field(name='Type:', value=self.notif_type)
         embed.add_field(name='In Guild:', value=self.guild.name)
