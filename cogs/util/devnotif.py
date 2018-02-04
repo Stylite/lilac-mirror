@@ -40,7 +40,7 @@ class DevNotif:
             self.notif_type = notif_type
 
         self.guild, self.channel, self.user = guild, channel, user
-        self.time = time_module.strftime("%D/%m/%Y %T PST")
+        self.time = time_module.strftime("%D %T PST")
 
     def format_into_embed(self):
         """Formats the DevNotif into an embed, and returns it.
@@ -55,7 +55,7 @@ class DevNotif:
             embed.colour = 0x2fef00
 
         embed.title = 'Notification (Thing Occured!):'
-        embed.set_author(name=f'{self.user.name}#{self.user.discriminator} [{self.user.id}]')
+        embed.set_author(name=f'From: `{self.user.name}#{self.user.discriminator} [{self.user.id}]`')
 
         embed.add_field(name='Type:', value=self.notif_type)
         embed.add_field(name='In Guild:', value=self.guild.name)
