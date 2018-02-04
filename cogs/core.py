@@ -21,7 +21,7 @@ class Core:
         
         Please do not spam this command! You will 
         be blacklisted if you do."""
-        notif = DevNotif(feedback, 'Feedback', ctx.guild, ctx.channel, ctx.message.author, time.time())
+        notif = DevNotif(feedback, 'Feedback', ctx.guild, ctx.channel, ctx.message.author)
         await notify_devs(ctx, notif)
 
 def setup(bot):

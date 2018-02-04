@@ -20,7 +20,7 @@ async def notify_devs(ctx, notif):
         
 
 class DevNotif:
-    def __init__(self, body, notif_type, guild, channel, user, time):
+    def __init__(self, body, notif_type, guild, channel, user):
         """Creates a DevNotif class.
         
         Params:
@@ -40,7 +40,7 @@ class DevNotif:
             self.notif_type = notif_type
 
         self.guild, self.channel, self.user = guild, channel, user
-        self.time = time_module.strftime("%D/%m/%Y %T PST", time)
+        self.time = time_module.strftime("%D/%m/%Y %T PST")
 
     def format_into_embed(self):
         """Formats the DevNotif into an embed, and returns it.
