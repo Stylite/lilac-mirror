@@ -23,6 +23,7 @@ class Core:
         be blacklisted if you do."""
         notif = DevNotif(feedback, 'Feedback', ctx.guild, ctx.channel, ctx.message.author)
         await notify_devs(ctx, notif)
+        await ctx.send(':white_check_mark: I have notified the developers of your feedback!')
 
 def setup(bot):
     bot.add_cog(Core(bot))
