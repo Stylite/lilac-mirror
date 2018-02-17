@@ -3,9 +3,39 @@ from discord.ext import commands
 import yaml
 import traceback
 import discord
+import os
 
 class Lilac(commands.Bot):
+    """Bot class for Lilac."""
+
+    DATAFILES = [
+        'data/welcomes.yml',
+        'data/goodbyes.yml',
+        'data/autoroles.yml',
+        'data/selfroles.yml',
+        'data/gblacklist.txt'
+    ]
+
     def __init__(self):
+        self.load_files()
+
+        super().__init__(
+            command_prefix='l!',
+            description='A bot made for moderation, fun, and verifying KnowYourMeme accounts with Discord.'
+        )
+
+    def create_data_files(self):
+        os.makedirs('data/')
+        for file_name in self.DATAFILES:
+            open(file_name, 'a').close()
+
+    def load_files(self):
+        if not os.path.exists('data/'):
+            self.create_data_files()
+
+        if not os.path.exists('config.yml'):
+            raise FileNotFoundError('The config.yml file is not present; reclone Lilac.') 
+
         self.config = {}
         self.welcomes, self.goodbyes = {}, {}
         self.autoroles, self.selfroles = {}, {}
@@ -21,11 +51,6 @@ class Lilac(commands.Bot):
             self.autoroles = yaml.load(autoroles)
         with open('data/selfroles.yml', 'r') as selfroles:
             self.selfroles = yaml.load(selfroles)
-
-        super().__init__(
-            command_prefix='l!',
-            description='A bot made for moderation, fun, and verifying KnowYourMeme accounts with Discord.'
-        )
 
     async def on_ready(self):
         """Function executes once bot is ready."""
