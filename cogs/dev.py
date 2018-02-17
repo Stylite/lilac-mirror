@@ -79,5 +79,16 @@ class Dev:
         output = '\n'.join(output.decode().splitlines())
         await ctx.send('**Git Response:** ```{}```'.format(output))
 
+    @commands.command(aliases=['bl'])
+    @is_cleared()
+    async def blacklist(self, ctx, *, user_id: int):
+        self.bot.blacklist.append(user_id)
+        with open('data/gblacklist.txt', 'a') as blacklist_file:
+            blacklist_file.write(str(user_id) + '\n')
+        await ctx.send(f':white_check_mark: {ctx.message.author}'+\
+                ', I\'ve blacklisted that user from using Lilac commands!')
+        
+
+
 def setup(bot):
     bot.add_cog(Dev(bot))

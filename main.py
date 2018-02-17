@@ -9,6 +9,8 @@ class Lilac(commands.Bot):
         self.config = {}
         self.welcomes, self.goodbyes = {}, {}
         self.autoroles, self.selfroles = {}, {}
+        self.blacklist = list(map(int, [s.strip() for s in open('data/gblacklist.txt')\
+                        .readlines()]))
         with open('config.yml', 'r') as config:
             self.config = yaml.load(config)
         with open('data/welcomes.yml', 'r') as welcomes:
@@ -94,6 +96,13 @@ class Lilac(commands.Bot):
 
             fmt_goodbye_message = goodbye_config[1].replace('%name%', member.name)
             await goodbye_channel.send(fmt_goodbye_message)
+
+    async def on_command(self, ctx):
+        """Handles on_command event."""
+        user_executing = ctx.message.author
+        if user_executing.id in self.gblacklist:
+            await ctx.send(':warning: You have been blacklisted from using all of Lilac\'s commands!')
+            return
 
 
     def run(self):
