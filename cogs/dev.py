@@ -130,5 +130,21 @@ class Dev:
         await user.send('You\'ve been whitelisted to use Lilac commands, which means you are now '+\
                         'unblacklisted -- you can use Lilac commands.')
 
+    @commands.command()
+    @is_cleared()
+    async def dm(self, ctx, user_id: int, *, message: str):
+        user = self.bot.get_user(user_id)
+        if user is None:
+            await ctx.send(':warning: I couldn\'t find that user!')
+
+        to_send = discord.Embed()
+        to_send.colour = 0xbd8cbf
+        to_send.description = message
+        to_send.set_footer(text='A message from the developers of Lilac.')
+
+        await user.send(embed=to_send)
+        await ctx.send(':white_check_mark: I\'ve DMed that user with your message!')
+
+
 def setup(bot):
     bot.add_cog(Dev(bot))

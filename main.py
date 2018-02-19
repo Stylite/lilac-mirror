@@ -13,7 +13,8 @@ class Lilac(commands.Bot):
         'data/goodbyes.yml',
         'data/autoroles.yml',
         'data/selfroles.yml',
-        'data/gblacklist.txt'
+        'data/gblacklist.txt',
+        'data/economy.yml'
     ]
 
     def __init__(self):
@@ -25,7 +26,7 @@ class Lilac(commands.Bot):
         )
 
     def create_data_files(self):
-        """Creates the data files; since there are none"""
+        """Creates the data dir; since it doesn't exist"""
         os.makedirs('data/')
         for file_name in self.DATAFILES:
             f = open(file_name, 'a')
@@ -33,10 +34,20 @@ class Lilac(commands.Bot):
                 f.write('null: null\n')
             f.close()
 
-
-    def load_files(self):
+    def update_data_files(self):
+        """Updates data files; ensures all are in place"""
         if not os.path.exists('data/'):
             self.create_data_files()
+
+        for file_name in self.DATAFILES:
+            if not os.path.exists(file_name):
+                with open(file_name, 'a') as f:
+                    if '.yml' in file_name:
+                        f.write('null: null\n')
+
+    def load_files(self):
+        """Loads all data files."""
+        self.update_data_files()
 
         if not os.path.exists('config.yml'):
             raise FileNotFoundError('The config.yml file is not present; reclone Lilac.') 
@@ -46,6 +57,8 @@ class Lilac(commands.Bot):
         self.autoroles, self.selfroles = {}, {}
         self.blacklist = list(map(int, [s.strip() for s in open('data/gblacklist.txt')\
                         .readlines()]))
+        self.economy = {}
+
         with open('config.yml', 'r') as config:
             self.config = yaml.load(config)
         with open('data/welcomes.yml', 'r') as welcomes:
@@ -56,6 +69,8 @@ class Lilac(commands.Bot):
             self.autoroles = yaml.load(autoroles)
         with open('data/selfroles.yml', 'r') as selfroles:
             self.selfroles = yaml.load(selfroles)
+        with open('data/economy.yml', 'r') as economy:
+            self.economy = yaml.load(economy)
 
     async def on_ready(self):
         """Function executes once bot is ready."""
@@ -87,7 +102,7 @@ class Lilac(commands.Bot):
 
 
     async def on_member_join(self, member):
-        """Function executes once a member joins a guild."""
+        """on_member_join event; handle welcome messages and autoroles"""
         # handle welcome messages
         if member.guild.id in self.welcomes:
             welcome_config = self.welcomes[member.guild.id]
@@ -115,6 +130,7 @@ class Lilac(commands.Bot):
                     await member.add_roles(to_add)
 
     async def on_member_remove(self, member):
+        """on_member_remove event; handle leave messages"""
         if member.guild.id in self.goodbyes:
             goodbye_config = self.goodbyes[member.guild.id]
 
