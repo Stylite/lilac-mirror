@@ -82,6 +82,10 @@ class Dev:
     @commands.command(aliases=['bl'])
     @is_cleared()
     async def blacklist(self, ctx, *, user_id: int):
+        """Blacklists a user from using Lilac commands.
+        
+        Prevents a user from using Lilac commands.
+        **Do not mention the user**, use the user id."""
         user = self.bot.get_user(user_id)
         if user is None:
             await ctx.send(':warning: I couldn\'t find that user.')
@@ -102,6 +106,10 @@ class Dev:
     @commands.command(aliases=['wl'])
     @is_cleared()
     async def whitelist(self, ctx, *, user_id: int):
+        """Whitelists a blacklisted user.
+        
+        Allows them to use Lilac commands again. 
+        **Do not mention the user**, use the user id."""
         user = self.bot.get_user(user_id)
         if user is None:
             await ctx.send(':warning: I couldn\'t find that user.')
