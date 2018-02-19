@@ -105,7 +105,7 @@ class Misc:
                     if not cmd.help:
                         cmd_help = 'No help message for this command...'
 
-                    send.description = 'Usage: {}\n\n{}'.format(self.usage(cmd), cmd_help)
+                    send.description = '**Usage:** `{}`\n\n{}'.format(self.usage(cmd), cmd_help)
                     break
 
             if found == [False, False]:
