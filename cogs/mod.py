@@ -25,7 +25,7 @@ class Mod:
             return
 
         await ctx.message.guild.ban(to_ban)
-        await ctx.send(':white_check_mark: Successfully banned user {}#{}'
+        await ctx.send(':white_check_mark: Successfully banned user `{}#{}`'
                        .format(to_ban.name, to_ban.discriminator))
 
     @commands.command()
@@ -42,7 +42,7 @@ class Mod:
             return
 
         await ctx.message.guild.kick(to_kick)
-        await ctx.send(':white_check_mark: Successfully kicked user {}#{}'
+        await ctx.send(':white_check_mark: Successfully kicked user `{}#{}`'
                        .format(to_kick.name, to_kick.discriminator))
 
     @commands.command()

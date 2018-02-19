@@ -25,9 +25,14 @@ class Lilac(commands.Bot):
         )
 
     def create_data_files(self):
+        """Creates the data files; since there are none"""
         os.makedirs('data/')
         for file_name in self.DATAFILES:
-            open(file_name, 'a').close()
+            f = open(file_name, 'a')
+            if '.yml' in file_name:
+                f.write('null: null\n')
+            f.close()
+
 
     def load_files(self):
         if not os.path.exists('data/'):
@@ -122,13 +127,13 @@ class Lilac(commands.Bot):
             fmt_goodbye_message = goodbye_config[1].replace('%name%', member.name)
             await goodbye_channel.send(fmt_goodbye_message)
 
-    async def on_command(self, ctx):
-        """Handles on_command event."""
-        user_executing = ctx.message.author
-        if user_executing.id in self.gblacklist:
-            await ctx.send(':warning: You have been blacklisted from using all of Lilac\'s commands!')
+    async def on_message(self, message):
+        """Handles on_message event."""
+        user_executing = message.author
+        if user_executing.id in self.blacklist:  # check if user is blacklisted
             return
-
+        else:
+            await self.process_commands(message)
 
     def run(self):
         """Run function for Lilac. Loads cogs and runs the bot."""
