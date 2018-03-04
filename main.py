@@ -5,6 +5,7 @@ import traceback
 import discord
 import os
 
+
 class Lilac(commands.Bot):
     """Bot class for Lilac."""
 
@@ -14,14 +15,15 @@ class Lilac(commands.Bot):
         'data/autoroles.yml',
         'data/selfroles.yml',
         'data/gblacklist.txt',
-        'data/economy.yml'
+        'data/economy.yml',
+        'data/prefixes.yml'
     ]
 
     def __init__(self):
         self.load_files()
 
         super().__init__(
-            command_prefix=',',
+            command_prefix='',
             description='A bot made for moderation, fun, and verifying KnowYourMeme accounts with Discord.'
         )
 
@@ -50,14 +52,16 @@ class Lilac(commands.Bot):
         self.update_data_files()
 
         if not os.path.exists('config.yml'):
-            raise FileNotFoundError('The config.yml file is not present; reclone Lilac.') 
+            raise FileNotFoundError(
+                'The config.yml file is not present; reclone Lilac.')
 
         self.config = {}
         self.welcomes, self.goodbyes = {}, {}
         self.autoroles, self.selfroles = {}, {}
-        self.blacklist = list(map(int, [s.strip() for s in open('data/gblacklist.txt')\
-                        .readlines()]))
+        self.blacklist = list(map(int, [s.strip() for s in open('data/gblacklist.txt')
+                                        .readlines()]))
         self.economy = {}
+        self.prefixes = {}
 
         with open('config.yml', 'r') as config:
             self.config = yaml.load(config)
@@ -71,24 +75,41 @@ class Lilac(commands.Bot):
             self.selfroles = yaml.load(selfroles)
         with open('data/economy.yml', 'r') as economy:
             self.economy = yaml.load(economy)
+        with open('data/prefixes.yml', 'r') as prefixes:
+            self.prefixes = yaml.load(prefixes)
+
+    async def get_prefix(self, message):
+        if message.guild.id in self.prefixes:
+            return self.prefixes[message.guild.id]
+        else:
+            return ","
 
     async def on_ready(self):
         """Function executes once bot is ready."""
         print('[INFO] Lilac is ready!')
-        print('[INFO] Logged in as {}#{}'.format(self.user.name, self.user.discriminator))
+        print('[INFO] Logged in as {}#{}'.format(
+            self.user.name, self.user.discriminator))
+
+        await self.change_presence(game=discord.Game(name=f"default prefix is ,"))
 
     async def on_command_error(self, ctx, exception):
         """Function executes once bot encounters an error"""
-        err = traceback.format_exception(type(exception), exception, \
-                                            exception.__traceback__, chain=False)
-        err = '\n'.join(err)
+        err = None
+        if isinstance(exception, commands.CommandInvokeError):
+            err = traceback.format_exception(type(exception.original), exception.original,
+                                         exception.original.__traceback__, chain=False)
+            err = '\n'.join(err)
+        else:
+            err = traceback.format_exception(type(exception), exception,
+                                         exception.__traceback__, chain=False)
+            err = '\n'.join(err)
         if isinstance(exception, commands.CommandInvokeError):
             exception = exception.original
             if isinstance(exception, discord.Forbidden):
                 await ctx.send(':warning: I don\'t have enough perms to do that.')
             else:
-                await ctx.send(f':warning: CommandInvokeError: ```{err}``` This should never happen, '+\
-                                'please report this to one of the developers.')
+                await ctx.send(f':warning: CommandInvokeError: ```{err}``` This should never happen, ' +
+                               'please report this to one of the developers.')
         elif isinstance(exception, commands.errors.MissingRequiredArgument):
             fmt_error = ''.join(exception.args)
             await ctx.send(f':warning: {fmt_error}')
@@ -97,9 +118,8 @@ class Lilac(commands.Bot):
         elif isinstance(exception, commands.errors.CheckFailure):
             await ctx.send(':warning: You don\'t have enough perms to perform that action.')
         else:
-            await ctx.send(f':warning: An error occured! ```{err}``` This should never happen;'+\
-                            ' please report this to one of the developers.')
-
+            await ctx.send(f':warning: An error occured! ```{err}``` This should never happen;' +
+                           ' please report this to one of the developers.')
 
     async def on_member_join(self, member):
         """on_member_join event; handle welcome messages and autoroles"""
@@ -113,7 +133,8 @@ class Lilac(commands.Bot):
             else:
                 return
 
-            fmt_welcome_message = welcome_config[1].replace('%mention%', member.mention)
+            fmt_welcome_message = welcome_config[1].replace(
+                '%mention%', member.mention)
             await welcome_channel.send(fmt_welcome_message)
         # handle autoroles
         if member.guild.id in self.autoroles:
@@ -140,7 +161,8 @@ class Lilac(commands.Bot):
             else:
                 return
 
-            fmt_goodbye_message = goodbye_config[1].replace('%name%', member.name)
+            fmt_goodbye_message = goodbye_config[1].replace(
+                '%name%', member.name)
             await goodbye_channel.send(fmt_goodbye_message)
 
     async def on_message(self, message):
@@ -166,7 +188,6 @@ class Lilac(commands.Bot):
 
         super().run(self.config['token'])
 
+
 Bot = Lilac()
 Bot.run()
-
-    

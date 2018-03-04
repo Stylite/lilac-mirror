@@ -42,7 +42,7 @@ class Mod:
             return
 
         await ctx.message.guild.kick(to_kick)
-        await ctx.send(':white_check_mark: Successfully kicked user `{}#{}`'
+        await ctx.send(':white_check_mark: Successfully kicked user `{}#{}`.'
                        .format(to_kick.name, to_kick.discriminator))
 
     @commands.command()
@@ -77,7 +77,7 @@ class Mod:
         self.bot.welcomes[ctx.message.guild.id][0] = ctx.message.channel_mentions[0].id
         yaml.dump(self.bot.welcomes, open('data/welcomes.yml', 'w'))
 
-        await ctx.send(':white_check_mark: Set your welcome channel to `{}`'
+        await ctx.send(':white_check_mark: Set your welcome channel to `{}`.'
                        .format(ctx.message.channel_mentions[0]))
 
     @commands.command()
@@ -130,7 +130,7 @@ class Mod:
             yaml.dump(self.bot.autoroles, open('data/autoroles.yml', 'w'))
 
         else:
-            await ctx.send(':warning: Invalid action. The valid actions are `add` and `remove`')
+            await ctx.send(':warning: Invalid action. The valid actions are `add` and `remove`.')
 
     @commands.command()
     @manage_roles()
@@ -194,7 +194,7 @@ class Mod:
         self.bot.goodbyes[ctx.message.guild.id][0] = ctx.message.channel_mentions[0].id
         yaml.dump(self.bot.welcomes, open('data/goodbyes.yml', 'w'))
 
-        await ctx.send(':white_check_mark: Set your goodbye channel to `{}`'
+        await ctx.send(':white_check_mark: Set your goodbye channel to `{}`.'
                        .format(ctx.message.channel_mentions[0]))
 
     @commands.command()
@@ -327,6 +327,13 @@ class Mod:
         await ctx.message.author.remove_roles(role)
         await ctx.send(f':white_check_mark: **{ctx.message.author.name}**, you no longer have `{role.name}` role.')
 
+    @commands.command()
+    @manage_guild()
+    async def prefix(self, ctx, *, new_prefix: str):
+        self.bot.prefixes[ctx.message.guild.id] = new_prefix
+        yaml.dump(self.bot.prefixes, open('data/prefixes.yml', 'w'))
+
+        await ctx.send(f':white_check_mark: Changed this guild\'s prefix to `{new_prefix}`')
 
 def setup(bot):
     bot.add_cog(Mod(bot))
