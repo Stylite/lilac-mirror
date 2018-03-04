@@ -24,6 +24,7 @@ class Economy:
 
     @commands.command(aliases=['bal'])
     async def balance(self, ctx):
+        """Gets your balance in <:lilac:419730009234866176>."""
         user = ctx.message.author
         if user.id not in self.bot.economy:
             self.create_bank_account(user)
@@ -33,6 +34,9 @@ class Economy:
 
     @commands.command()
     async def daily(self, ctx):
+        """Gives you your daily <:lilac:419730009234866176>.
+        
+        Refreshes every 20 hours. """
         user = ctx.message.author
         if user.id not in self.bot.economy:
             self.create_bank_account(user)
