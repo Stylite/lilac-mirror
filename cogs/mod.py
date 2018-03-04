@@ -85,8 +85,8 @@ class Mod:
     async def autorole(self, ctx, action: str, *, role_name: str):
         """Creates/removes autoroles.
 
-        To create an autorole, do `l!autorole add <role-name>`.
-        To remove an autorole, do `l!autorole remove <role-name>`"""
+        To create an autorole, do `,autorole add <role-name>`.
+        To remove an autorole, do `,autorole remove <role-name>`"""
 
         if action.lower() == 'add':
             to_add = None
@@ -202,8 +202,8 @@ class Mod:
     async def selfrole(self, ctx, action: str, *, role_name: str):
         """Creates/removes selfroles (self-assignable roles).
 
-        To create a selfrole, do `l!selfrole add <role_name>`.
-        To remove a selfrole, do `l!selfrole remove <role_name>`"""
+        To create a selfrole, do `,selfrole add <role_name>`.
+        To remove a selfrole, do `,selfrole remove <role_name>`"""
         if action.lower() == 'add':
             role = None
             for r in ctx.message.guild.roles:
@@ -248,17 +248,21 @@ class Mod:
     @commands.command()
     async def selfroles(self, ctx):
         """Lists all the selfroles for a guild."""
+        if ctx.message.guild.id not in self.bot.selfroles:
+            await ctx.send('This guild does not have any selfroles.')
+            return
+
         selfrole_ids = self.bot.selfroles[ctx.message.guild.id]
         selfrole_names = []
+
+        if len(selfrole_ids) == 0:
+            await ctx.send('This guild does not have any selfroles.')
+            return
 
         for r_id in selfrole_ids:
             for r in ctx.message.guild.roles:
                 if r_id == r.id:
                     selfrole_names.append(r.name)
-
-        if selfrole_names is None:
-            await ctx.send('This server does not have any selfroles.')
-            return
 
         msg = 'This server\'s selfroles are: ```'
         for role in selfrole_names:

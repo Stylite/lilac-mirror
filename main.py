@@ -21,7 +21,7 @@ class Lilac(commands.Bot):
         self.load_files()
 
         super().__init__(
-            command_prefix='l!',
+            command_prefix=',',
             description='A bot made for moderation, fun, and verifying KnowYourMeme accounts with Discord.'
         )
 

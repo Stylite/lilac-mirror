@@ -69,7 +69,7 @@ class Misc:
 
         if len(args) == 0:
             send.title = "Lilac Help"
-            send.description = "To get the commands in each category, use ```l!help <category-name>```"
+            send.description = "To get the commands in each category, use ```,help <category-name>```"
             for cat in cats:
                 cat_cmds = self.bot.get_cog_commands(cat)
                 send.add_field(name=cat, value='{} commands'.format(str(len(cat_cmds))), inline=False)
@@ -85,7 +85,7 @@ class Misc:
 
                     send.title = '{} Commands'.format(cat)
                     send.description = 'To get more details about each command, use ' +\
-                                     '```l!help <command-name>```'
+                                     '```,help <command-name>```'
 
                     for cmd in cat_cmds:
                         if cmd.brief is None and cmd.help is not None:
