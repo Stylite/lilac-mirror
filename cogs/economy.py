@@ -61,6 +61,46 @@ class Economy:
 
         self.update_file()
 
+    @commands.command()
+    async def tribute(self, ctx, *, amount: int):
+        """Tributes some amount of <:lilac:419730009234866176> to the gods.
+
+        If the gods like your offering, they'll reward you with more money.
+        If not, they'll take your money.
+
+        And yes, you can be left with a negative amount of money."""
+        user = ctx.message.author
+        if user.id not in self.bot.economy:
+            self.create_bank_account(user)
+        if amount > self.bot.economy[user.id]['balance']:
+            await ctx.send(':warning: You don\'t have enough money to make that tribute!')
+            return
+        if amount < 0:
+            await ctx.send(f':warning: You can\'t tribute less than {self.lilac}**0**!')
+
+        random.seed(str(amount) + str(time.time()))
+        self.bot.economy[user.id]['balance'] -= amount 
+
+        gods_like = random.randrange(0, 4)
+        if gods_like != 0:
+            take_away = random.randrange(0, 500)
+            self.bot.economy[user.id]['balance'] -= take_away
+            bal = self.bot.economy[user.id]['balance']
+
+            await ctx.send(f':exclamation: The gods don\'t like your offering of {self.lilac}**{amount}**!\n' +\
+                           f'They take away {self.lilac}**{take_away}** from you, leaving you with' +\
+                           f' {self.lilac}**{bal}**!')
+        else:
+            give_to = random.randrange(0, 1000)
+            self.bot.economy[user.id]['balance'] += give_to
+            bal = self.bot.economy[user.id]['balance']
+
+            await ctx.send(f':thumbsup: The gods love your offering of {amount}!\n' +\
+                           f'They give you {self.lilac}**{give_to}**, leaving you with' +\
+                           f' {self.lilac}**{bal}**!')
+
+        self.update_file()
+
 
 def setup(bot):
     bot.add_cog(Economy(bot))

@@ -114,7 +114,7 @@ class Lilac(commands.Bot):
             fmt_error = ''.join(exception.args)
             await ctx.send(f':warning: {fmt_error}')
         elif isinstance(exception, commands.CommandNotFound):
-            await ctx.send(':warning: Command not found.')
+            pass
         elif isinstance(exception, commands.errors.CheckFailure):
             await ctx.send(':warning: You don\'t have enough perms to perform that action.')
         else:

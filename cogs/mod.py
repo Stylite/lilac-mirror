@@ -330,6 +330,7 @@ class Mod:
     @commands.command()
     @manage_guild()
     async def prefix(self, ctx, *, new_prefix: str):
+        """Sets the prefix for the guild."""
         self.bot.prefixes[ctx.message.guild.id] = new_prefix
         yaml.dump(self.bot.prefixes, open('data/prefixes.yml', 'w'))
 
