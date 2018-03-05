@@ -175,6 +175,7 @@ class Dev:
     @commands.command()
     @is_cleared()
     async def getlog(self, ctx, *, count: int):
+        """Gets the last <count> log items."""
         logs = self.bot.logger.get_log(count)
         await ctx.send(f'Here are the last **{count}** log items:\n```css\n{logs}\n```')
 
