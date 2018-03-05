@@ -175,6 +175,8 @@ class Lilac(commands.Bot):
         user_executing = message.author
         if user_executing.id in self.blacklist:  # check if user is blacklisted
             return
+        elif isinstance(message.channel, discord.DMChannel):
+            return
         else:
             await self.process_commands(message)
 
