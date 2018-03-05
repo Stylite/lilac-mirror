@@ -28,11 +28,10 @@ class Dev:
             self.bot.load_extension(cog)
         except Exception as e:
             await ctx.send(':warning: Failed to reload cog `{}`, because:```{}```'.format(cog, str(e)))
-            print('[LOAD] Failed to reload cog `{}`, because: '.format(cog))
-            print(e)
+            self.bot.logger.log('LOAD', f'Failed to reload cog `{cog}`, because:\n\t{str(e)}')
         else:
-            await ctx.send(':white_check_mark: Reloaded cog `{}`'.format(cog))
-            print('[LOAD] Reloaded cog `{}`'.format(cog))
+            await ctx.send(f':white_check_mark: Reloaded cog `{cog}`')
+            self.bot.logger.log('LOAD', f'Reloaded cog `{cog}`')
 
     @commands.command(aliases=['reboot'])
     @is_cleared()
@@ -47,11 +46,9 @@ class Dev:
     @commands.command(aliases=['evaluate'])
     @is_cleared()
     async def debug(self, ctx, *, code: str):
-        """Evaluates some code.
-
-        Must be an expression."""
+        """Executes some code."""
         try:
-            res = eval(code)
+            res = exec(code)
         except Exception as e:
             await ctx.send(f':warning: Error: ```{str(e)}```')
             return
@@ -157,7 +154,6 @@ class Dev:
         """Gets a user's information from their username & discrim."""
         found_user = None
         users = self.bot.get_all_members()
-        print(users)
         for user in users:
             if str(user).lower() == user_name.lower():
                 found_user = user
@@ -176,6 +172,11 @@ class Dev:
 
         await ctx.send(embed=to_send)
 
+    @commands.command()
+    @is_cleared()
+    async def getlog(self, ctx, *, count: int):
+        logs = self.bot.logger.get_log(count)
+        await ctx.send(f'Here are the last **{count}** log items:\n```css\n{logs}\n```')
 
 def setup(bot):
     bot.add_cog(Dev(bot))

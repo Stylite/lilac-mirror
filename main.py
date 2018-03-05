@@ -1,9 +1,13 @@
 #!/usr/bin/env python
-from discord.ext import commands
 import yaml
 import traceback
-import discord
 import os
+from cogs.util.logging import Logger
+
+from discord.ext import commands
+import discord
+
+"""Main source file for Lilac -- run this to start the bot."""
 
 
 class Lilac(commands.Bot):
@@ -21,6 +25,7 @@ class Lilac(commands.Bot):
 
     def __init__(self):
         self.load_files()
+        self.logger = Logger()
 
         super().__init__(
             command_prefix='',
@@ -86,29 +91,29 @@ class Lilac(commands.Bot):
 
     async def on_ready(self):
         """Function executes once bot is ready."""
-        print('[INFO] Lilac is ready!')
-        print('[INFO] Logged in as {}#{}'.format(
-            self.user.name, self.user.discriminator))
+        self.logger.log('INFO', 'Lilac is ready!')
+        self.logger.log('INFO', f'Logged in as {str(self.user)}')
 
-        await self.change_presence(game=discord.Game(name=f"default prefix is ,"))
+        await self.change_presence(game=discord.Game(name="default prefix is ,"))
 
     async def on_command_error(self, ctx, exception):
         """Function executes once bot encounters an error"""
         err = None
         if isinstance(exception, commands.CommandInvokeError):
             err = traceback.format_exception(type(exception.original), exception.original,
-                                         exception.original.__traceback__, chain=False)
+                                             exception.original.__traceback__, chain=False)
             err = '\n'.join(err)
         else:
             err = traceback.format_exception(type(exception), exception,
-                                         exception.__traceback__, chain=False)
+                                             exception.__traceback__, chain=False)
             err = '\n'.join(err)
+
         if isinstance(exception, commands.CommandInvokeError):
             exception = exception.original
             if isinstance(exception, discord.Forbidden):
                 await ctx.send(':warning: I don\'t have enough perms to do that.')
             else:
-                await ctx.send(f':warning: CommandInvokeError: ```{err}``` This should never happen, ' +
+                await ctx.send(f':warning: `CommandInvokeError`: ```{err}``` This should never happen, ' +
                                'please report this to one of the developers.')
         elif isinstance(exception, commands.errors.MissingRequiredArgument):
             fmt_error = ''.join(exception.args)
@@ -120,6 +125,7 @@ class Lilac(commands.Bot):
         else:
             await ctx.send(f':warning: An error occured! ```{err}``` This should never happen;' +
                            ' please report this to one of the developers.')
+            self.logger.log('ERR', f'Error Occured:\n{err}')
 
     async def on_member_join(self, member):
         """on_member_join event; handle welcome messages and autoroles"""
@@ -144,7 +150,6 @@ class Lilac(commands.Bot):
                 for role in member.guild.roles:
                     if role.id == role_id:
                         to_add = role
-                        print(to_add.name)
                         break
 
                 if to_add:
@@ -181,10 +186,9 @@ class Lilac(commands.Bot):
             try:
                 self.load_extension(cog)
             except Exception as e:
-                print('[LOAD] Failed to load cog ' + cog)
-                print(e)
+                self.logger.log('LOAD', f'Failed to load cog {cog}:\n\t{e}')
             else:
-                print('[LOAD] Loaded cog {}'.format(cog))
+                self.logger.log('LOAD', f'Loaded cog {cog}')
 
         super().run(self.config['token'])
 

@@ -8,6 +8,7 @@ from cogs.util.devnotif import DevNotif, notify_devs
 
 
 class Core:
+    """Core commands"""
     def __init__(self, bot):
         self.bot = bot
 

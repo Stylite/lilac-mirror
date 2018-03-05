@@ -8,6 +8,7 @@ import discord
 
 
 class Economy:
+    """Economy commands"""
     def __init__(self, bot):
         self.bot = bot
         self.lilac = '<:lilac:419730009234866176>'
@@ -77,6 +78,7 @@ class Economy:
             return
         if amount < 0:
             await ctx.send(f':warning: You can\'t tribute less than {self.lilac}**0**!')
+            return 
 
         random.seed(str(amount) + str(time.time()))
         self.bot.economy[user.id]['balance'] -= amount 

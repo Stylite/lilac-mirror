@@ -17,13 +17,13 @@ class Misc:
 
         return f'{self.bot.command_prefix}{cmd.name} {params_string}'
 
-    @commands.command()
+    @commands.command(aliases=['h'])
     async def help(self, ctx, *args):
         """Shows the help message.
 
         What did you expect?!"""
         def cmp_to_key(mycmp):
-            'Convert a cmp= function into a key= function'
+            """Convert a cmp= function into a key= function"""
             class K(object):
                 def __init__(self, obj, *args):
                     self.obj = obj

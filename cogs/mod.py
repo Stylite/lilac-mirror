@@ -1,8 +1,9 @@
 #!/usr/bin/env python
-from discord.ext import commands
-import discord
 import yaml
 from cogs.util.checks import manage_usrs, manage_guild, manage_roles
+
+from discord.ext import commands
+import discord
 
 
 class Mod:
@@ -335,6 +336,7 @@ class Mod:
         yaml.dump(self.bot.prefixes, open('data/prefixes.yml', 'w'))
 
         await ctx.send(f':white_check_mark: Changed this guild\'s prefix to `{new_prefix}`')
+
 
 def setup(bot):
     bot.add_cog(Mod(bot))
