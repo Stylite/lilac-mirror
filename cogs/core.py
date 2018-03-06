@@ -25,6 +25,13 @@ class Core:
         await ctx.send('__**Feedback & Bug Reporting Form:**__\nhttps://goo.gl/forms/jMmS8JPg1CX4E0Li2' +
                        '\n\n**__Valid__** feedback would be greatly appreciated!')
 
+    @commands.command()
+    async def support(self, ctx):
+        """Gives you an invite to the support server."""
+        to_send = discord.Embed(title="Support Server", description="https://discord.gg/EcW7kfa",\
+                                colour=0xbd8cbf)
+        await ctx.send(embed=to_send)
+
 
 def setup(bot):
     bot.add_cog(Core(bot))
