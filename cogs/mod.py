@@ -138,13 +138,13 @@ class Mod:
     async def autoroles(self, ctx):
         """Lists current autoroles."""
         if ctx.message.guild.id not in self.bot.autoroles:
-            await ctx.send(':x: You currently do not have any autoroles.')
+            await ctx.send('This guild does not have any autoroles.')
             return
 
         autorole_id_list = self.bot.autoroles[ctx.message.guild.id]
 
         if len(autorole_id_list) == 0:
-            await ctx.send(':x: You currently do not have any autoroles.')
+            await ctx.send('This guild does not have any autoroles.')
             return
 
         autorole_list = []
@@ -154,7 +154,14 @@ class Mod:
                 if r.id == role_id:
                     role = r
                     break
-            autorole_list.append(role.name)
+            if role is not None:
+                autorole_list.append(role.name)
+            else:
+                self.bot.autoroles[ctx.message.guild.id].remove(role_id)
+                yaml.dump(self.bot.autoroles, open('data/autoroles.yml', 'w'))
+
+        if len(autorole_list) == 0:
+            await ctx.send('This guild does not have any autoroles.')
 
         message = 'This guild\'s current autoroles are: ```'
         for autorole in autorole_list:
