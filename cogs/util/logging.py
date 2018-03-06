@@ -13,6 +13,9 @@ class Logger:
             to_return = self.logs[-1*count:]
             return '\n'.join(to_return)
 
+    def write(self, data):
+        self.logs.append(data)
+
     def log(self, tag, message):
         self.logs.append(f'[{tag}] {message}')
         print(self.logs[-1])

@@ -2,6 +2,7 @@
 import yaml
 import traceback
 import os
+import sys
 from cogs.util.logging import Logger
 
 from discord.ext import commands
@@ -25,7 +26,9 @@ class Lilac(commands.Bot):
 
     def __init__(self):
         self.load_files()
+        
         self.logger = Logger()
+        sys.stderr = self.logger
 
         super().__init__(
             command_prefix='',
