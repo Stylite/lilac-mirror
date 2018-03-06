@@ -162,6 +162,7 @@ class Mod:
 
         if len(autorole_list) == 0:
             await ctx.send('This guild does not have any autoroles.')
+            return
 
         message = 'This guild\'s current autoroles are: ```'
         for autorole in autorole_list:
