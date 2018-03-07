@@ -141,35 +141,28 @@ class Mod:
             await ctx.send('This guild does not have any autoroles.')
             return
 
-        autorole_id_list = self.bot.autoroles[ctx.message.guild.id]
+        autorole_ids = self.bot.autoroles[ctx.message.guild.id]
+        autorole_names = []
 
-        if len(autorole_id_list) == 0:
-            await ctx.send('This guild does not have any autoroles.')
-            return
-
-        autorole_list = []
-        for role_id in autorole_id_list:
-            role = None
+        for r_id in autorole_ids:
             for r in ctx.message.guild.roles:
-                if r.id == role_id:
-                    role = r
+                if r_id == r.id:
+                    autorole_names.append(r.name)
                     break
-            if role is not None:
-                autorole_list.append(role.name)
             else:
-                self.bot.autoroles[ctx.message.guild.id].remove(role_id)
+                self.bot.autoroles[ctx.message.guild.id].remove(r_id)
                 yaml.dump(self.bot.autoroles, open('data/autoroles.yml', 'w'))
 
-        if len(autorole_list) == 0:
+        if len(autorole_names) == 0:
             await ctx.send('This guild does not have any autoroles.')
             return
 
-        message = 'This guild\'s current autoroles are: ```'
-        for autorole in autorole_list:
-            message += f'• {autorole}\n'
-        message += '```'
+        msg = 'This server\'s autoroles are: ```'
+        for role in autorole_names:
+            msg += f'• {role}\n'
+        msg += '```'
 
-        await ctx.send(message)
+        await ctx.send(msg)
 
     @commands.command()
     @manage_guild()
@@ -264,14 +257,18 @@ class Mod:
         selfrole_ids = self.bot.selfroles[ctx.message.guild.id]
         selfrole_names = []
 
-        if len(selfrole_ids) == 0:
-            await ctx.send('This guild does not have any selfroles.')
-            return
-
         for r_id in selfrole_ids:
             for r in ctx.message.guild.roles:
                 if r_id == r.id:
                     selfrole_names.append(r.name)
+                    break
+            else:
+                self.bot.selfroles[ctx.message.guild.id].remove(r_id)
+                yaml.dump(self.bot.selfroles, open('data/selfroles.yml', 'w'))
+
+        if len(selfrole_names) == 0:
+            await ctx.send('This guild does not have any selfroles.')
+            return
 
         msg = 'This server\'s selfroles are: ```'
         for role in selfrole_names:
