@@ -2,6 +2,7 @@
 import random
 import yaml
 import time
+from cogs.util.checks import manage_guild
 
 from discord.ext import commands
 import discord
@@ -23,6 +24,79 @@ class Economy:
             'daily': 0
         }
         self.update_file()
+
+    @commands.command()
+    @manage_guild()
+    async def startpool(self, ctx):
+        """Starts a pool of <:lilac:419730009234866176> for a guild.
+        
+        Once the pool is created, users should be notified that a pool
+        has started, and be encouraged to donate to the pool, by doing
+        `pool <some-amt>`. When the `poolout` command is executed, by an
+        Admin, the pool's contents will be given to random member of the
+        current guild."""
+        self.bot.economy['pools'][ctx.message.guild.id] = 0
+        self.update_file()
+
+        await ctx.send(f':white_check_mark: I\'ve started a {self.lilac} pool! '+\
+                        f'Members of this guild can put some {self.lilac} in the pool by doing '+\
+                        f'`pool [some-amount]`. When you feel the pool has reached a high enough size, '+\
+                        f'run `poolout` and all of the {self.lilac} in the pool will be given to a random '+\
+                        f'member in this guild!')
+
+    @commands.command()
+    async def pool(self, ctx, *, amt: int):
+        """Pools in <:lilac:419730009234866176> to the guild pool!
+        
+        After some time, a random member will be selected and the
+        contents of the pool will go out to them."""
+        user = ctx.message.author
+        guild = ctx.message.guild
+        if guild.id not in self.bot.economy['pools']:
+            await ctx.send(':x: This guild is not currently hosting a pool event!')
+            return
+        if self.bot.economy['pools'][guild.id] is None:
+            await ctx.send(':x: This guild is not currently hosting a pool event!')
+            return
+        
+        if amt > self.bot.economy[user.id]['balance']:
+            await ctx.send(f':warning: You don\'t have enough {self.lilac} to make that pool contribution!')
+            return
+        if amt < 0:
+            await ctx.send(f':warning: You can\'t put a negative number of {self.lilac} into the pool!')
+            return
+
+        self.bot.economy[user.id]['balance'] -= amt
+        self.bot.economy['pools'][guild.id] += amt
+        self.update_file()
+
+        await ctx.send(f':white_check_mark: I\'ve put {self.lilac}**{amt}** from your'+\
+                        ' account into the pool!')
+            
+    @commands.command()
+    @manage_guild()
+    async def poolout(self, ctx):
+        """Picks a random member and sends them the content of the pool!"""
+        guild = ctx.message.guild
+        if guild.id not in self.bot.economy['pools']:
+            ctx.send(':x: This guild is not currently hosting a pool event!')
+            return
+        if self.bot.economy['pools'][guild.id] is None:
+            ctx.send(':x: This guild is not currently hosting a pool event!')
+            return
+
+        winner = random.choice(guild.members)
+        pool_total = self.bot.economy['pools'][guild.id]
+
+        await ctx.send(f'{winner.mention} has won the pool! {self.lilac}**{pool_total}** goes to them!')
+
+        if winner.id not in self.bot.economy:
+            self.create_bank_account(winner)
+
+        self.bot.economy[winner.id]['balance'] += pool_total
+        self.bot.economy['pools'][guild.id] = None
+        self.update_file()
+
 
     @commands.command(aliases=['bal'])
     async def balance(self, ctx):
