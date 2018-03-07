@@ -29,6 +29,7 @@ class Lilac(commands.Bot):
         
         self.logger = Logger()
         sys.stderr = self.logger
+        sys.stdout = self.logger
 
         super().__init__(
             command_prefix='',

@@ -17,5 +17,4 @@ class Logger:
         self.logs.append(data)
 
     def log(self, tag, message):
-        self.logs.append(f'[{tag}] {message}')
-        print(self.logs[-1])
+        print(f'[{tag}] {message}')
