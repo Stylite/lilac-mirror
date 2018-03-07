@@ -53,7 +53,8 @@ class Dev:
             await ctx.send(f':warning: Error: ```{str(e)}```')
             return
         else:
-            await ctx.send(f':white_check_mark: Execution successful. Result: ```{str(res)}```')
+            await ctx.send(f':white_check_mark: Execution successful. Result: ```{str(res)}```'+\
+                            'You will most likely receive `None` as the returned result; this is normal.')
 
     @commands.command(aliases=['pgit'])
     @is_cleared()

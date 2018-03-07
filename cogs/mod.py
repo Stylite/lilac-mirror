@@ -13,6 +13,34 @@ class Mod:
         self.bot = bot
 
     @commands.command()
+    async def mute(self, ctx, mention: str):
+        to_mute = None
+        if ctx.message.mentions:
+            to_mute = ctx.message.mentions[0]
+        else:
+            await ctx.send(':warning: You did not mention a user to mute.')
+
+        mute_role = None
+        guild = ctx.message.guild
+        if 'lilac-mute' not in [r.name for r in guild.roles]:
+            mute_role = await guild.create_role(name='lilac-mute', reason='create mute role')
+        else:
+            for role in guild.roles:
+                if role.name == 'lilac-mute':
+                    mute_role = role
+
+        perm_overwrite_pair = (mute_role, discord.PermissionOverwrite(send_messages=False, \
+                                send_tts_messages=False))
+        for channel in guild.channels:
+            if perm_overwrite_pair not in channel.overwrites:
+                await channel.set_permissions(perm_overwrite_pair[0], overwrite=perm_overwrite_pair[1])
+
+        await to_mute.add_roles(mute_role)
+        await ctx.send(':white_check_mark: I\'ve muted that user for you! You can unmute them'+\
+                        ' by removing their `lilac-mute` role, or by running `unmute @user`.')
+            
+
+    @commands.command()
     @manage_usrs()
     async def ban(self, ctx, *, mention: str):
         """Bans a user. 
