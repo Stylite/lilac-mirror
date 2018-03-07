@@ -118,6 +118,8 @@ class Lilac(commands.Bot):
             else:
                 await ctx.send(f':warning: `CommandInvokeError`: ```{err}``` This should never happen, ' +
                                'please report this to one of the developers.')
+        elif isinstance(exception, commands.errors.BadArgument):
+            await ctx.send(f':warning: One or more of the arguments you just gave me are invalid.')
         elif isinstance(exception, commands.errors.MissingRequiredArgument):
             fmt_error = ''.join(exception.args)
             await ctx.send(f':warning: {fmt_error}')
