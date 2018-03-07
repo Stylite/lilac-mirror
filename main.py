@@ -97,7 +97,7 @@ class Lilac(commands.Bot):
         self.logger.log('INFO', 'Lilac is ready!')
         self.logger.log('INFO', f'Logged in as {str(self.user)}')
 
-        await self.change_presence(game=discord.Game(name="default prefix is ,"))
+        await self.change_presence(activity=discord.Game(name="default prefix is ,"))
 
     async def on_command_error(self, ctx, exception):
         """Function executes once bot encounters an error"""
