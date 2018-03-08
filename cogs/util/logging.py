@@ -8,13 +8,13 @@ class Logger:
 
     def get_log(self, count):
         if count > len(self.logs):
-            return '\n'.join(self.logs)
+            return ''.join(self.logs)
         else:
             to_return = self.logs[-1*count:]
-            return '\n'.join(to_return)
+            return ''.join(to_return)
 
     def write(self, data):
-        self.logs.append(data.strip())
+        self.logs.append(data.strip() + '\n')
 
     def log(self, tag, message):
         print(f'[{tag}] {message}')
