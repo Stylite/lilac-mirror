@@ -15,7 +15,11 @@ class Mod:
     @commands.command()
     @manage_usrs()
     async def mute(self, ctx, mention: str):
-        """Mutes a user."""
+        """Mutes a user.
+        
+        Creates a role name `lilac-mute`, loops through
+        all the channels and sets the role to be unable to
+        speak, and gives mentioned person the role."""
         to_mute = None
         if ctx.message.mentions:
             to_mute = ctx.message.mentions[0]
@@ -30,6 +34,9 @@ class Mod:
             for role in guild.roles:
                 if role.name == 'lilac-mute':
                     mute_role = role
+            if role in to_mute.roles:
+                await ctx.send(f':warning: `{str(to_mute)}` is already muted!')
+                return
 
         perm_overwrite_pair = (mute_role, discord.PermissionOverwrite(send_messages=False, \
                                 send_tts_messages=False))
@@ -38,7 +45,7 @@ class Mod:
                 await channel.set_permissions(perm_overwrite_pair[0], overwrite=perm_overwrite_pair[1])
 
         await to_mute.add_roles(mute_role)
-        await ctx.send(f':white_check_mark: I\'ve muted {to_mute.nick}! You can unmute them'+\
+        await ctx.send(f':white_check_mark: I\'ve muted `{str(to_mute)}`! You can unmute them'+\
                         ' by removing their `lilac-mute` role, or by running `unmute @user`.')
 
     @commands.command()
@@ -62,7 +69,7 @@ class Mod:
 
         await to_unmute.remove_roles(mute_role)
         
-        await ctx.send(f':white_check_mark: I\'ve unmuted {to_unmute.nick}! They can now speak!')
+        await ctx.send(f':white_check_mark: I\'ve unmuted `{str(to_unmute)}`! They can now speak!')
             
 
     @commands.command()
