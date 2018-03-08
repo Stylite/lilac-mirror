@@ -40,7 +40,7 @@ class Mod:
 
         perm_overwrite_pair = (mute_role, discord.PermissionOverwrite(send_messages=False, \
                                 send_tts_messages=False))
-        for channel in guild.channels:
+        async for channel in guild.channels:
             if perm_overwrite_pair not in channel.overwrites:
                 await channel.set_permissions(perm_overwrite_pair[0], overwrite=perm_overwrite_pair[1])
 
