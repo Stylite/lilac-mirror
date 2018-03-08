@@ -90,10 +90,10 @@ class Economy:
         """Picks a random member and sends them the content of the pool!"""
         guild = ctx.message.guild
         if guild.id not in self.bot.economy['pools']:
-            ctx.send(':x: This guild is not currently hosting a pool event!')
+            await ctx.send(':x: This guild is not currently hosting a pool event!')
             return
         if self.bot.economy['pools'][guild.id] is None:
-            ctx.send(':x: This guild is not currently hosting a pool event!')
+            await ctx.send(':x: This guild is not currently hosting a pool event!')
             return
 
         winner = random.choice(guild.members)
