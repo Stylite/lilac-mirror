@@ -13,7 +13,9 @@ class Mod:
         self.bot = bot
 
     @commands.command()
+    @manage_usrs()
     async def mute(self, ctx, mention: str):
+        """Mutes a user."""
         to_mute = None
         if ctx.message.mentions:
             to_mute = ctx.message.mentions[0]
@@ -36,8 +38,31 @@ class Mod:
                 await channel.set_permissions(perm_overwrite_pair[0], overwrite=perm_overwrite_pair[1])
 
         await to_mute.add_roles(mute_role)
-        await ctx.send(':white_check_mark: I\'ve muted that user for you! You can unmute them'+\
+        await ctx.send(f':white_check_mark: I\'ve muted {to_mute.nick}! You can unmute them'+\
                         ' by removing their `lilac-mute` role, or by running `unmute @user`.')
+
+    @commands.command()
+    @manage_usrs()
+    async def unmute(self, ctx, *, user_mention: str):
+        """Unmutes a user."""
+        to_unmute = None
+        if ctx.message.mentions:
+            to_unmute = ctx.message.mentions[0]
+        else:
+            await ctx.send(':warning: You did not mention a user to unmute.')
+
+        if 'lilac-mute' not in [r.name for r in to_unmute.roles]:
+            await ctx.send(':warning: That user is not currently muted!')
+            return
+
+        mute_role = None
+        for role in ctx.message.guild.roles:
+            if role.name == 'lilac-mute':
+                mute_role = role 
+
+        await to_unmute.remove_roles(mute_role)
+        
+        await ctx.send(f':white_check_mark: I\'ve unmuted {to_unmute.nick}! They can now speak!')
             
 
     @commands.command()
