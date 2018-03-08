@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import asyncio 
 import yaml
 from cogs.util.checks import manage_usrs, manage_guild, manage_roles
 
@@ -402,6 +403,18 @@ class Mod:
 
         await ctx.send(f':white_check_mark: Changed this guild\'s prefix to `{new_prefix}`')
 
+    @commands.command()
+    async def purge(self, ctx, *, number: int):
+        if number < 1 or number > 100:
+            await ctx.send(':warning: I can only purge between 1 and 150 messages!') 
+            return
+        
+        async for message in ctx.message.channel.history(limit=number):
+            await message.delete()
+
+        notif_msg = await ctx.send(f':white_check_mark: I\'ve purged {number} messages for you!')
+        asyncio.sleep(3)
+        await notif_msg.delete()
 
 def setup(bot):
     bot.add_cog(Mod(bot))
