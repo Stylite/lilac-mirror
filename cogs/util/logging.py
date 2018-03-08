@@ -14,7 +14,7 @@ class Logger:
             return '\n'.join(to_return)
 
     def write(self, data):
-        self.logs.append(data)
+        self.logs.append(data.strip())
 
     def log(self, tag, message):
         print(f'[{tag}] {message}')
