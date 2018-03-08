@@ -154,7 +154,8 @@ class Economy:
         If the gods like your offering, they'll reward you with more money.
         If not, they'll take your money.
 
-        And yes, you can be left with a negative amount of money."""
+        Yes, you can be left with a negative amount of money, but it's capped
+        at -5."""
         user = ctx.message.author
         if user.id not in self.bot.economy:
             self.create_bank_account(user)
