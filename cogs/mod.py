@@ -405,15 +405,19 @@ class Mod:
 
     @commands.command()
     async def purge(self, ctx, *, number: int):
+        """Purges a number of messages.
+        
+        Number must be between 1 & 100."""
         if number < 1 or number > 100:
-            await ctx.send(':warning: I can only purge between 1 and 150 messages!') 
+            await ctx.send(':warning: I can only purge between 1 and 100 messages!') 
             return
         
         async for message in ctx.message.channel.history(limit=number):
             await message.delete()
+            asyncio.sleep(0.2)
 
         notif_msg = await ctx.send(f':white_check_mark: I\'ve purged {number} messages for you!')
-        asyncio.sleep(3)
+        asyncio.sleep(7.0)
         await notif_msg.delete()
 
 def setup(bot):
