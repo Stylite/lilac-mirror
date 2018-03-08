@@ -45,11 +45,11 @@ class Economy:
                         f'member in this guild!')
 
     @commands.command()
-    async def pool(self, ctx, *, amt: int):
+    async def pool(self, ctx, *args):
         """Pools in <:lilac:419730009234866176> to the guild pool!
         
-        After some time, a random member will be selected and the
-        contents of the pool will go out to them."""
+        To check how many<:lilac:419730009234866176> are currently in the pool,
+        do `pool check` """
         user = ctx.message.author
         guild = ctx.message.guild
         if guild.id not in self.bot.economy['pools']:
@@ -58,20 +58,31 @@ class Economy:
         if self.bot.economy['pools'][guild.id] is None:
             await ctx.send(':x: This guild is not currently hosting a pool event!')
             return
+
+        if args[0] == 'check':
+            in_pool = self.bot.economy['pools'][guild.id]
+            await ctx.send(f'This guild currently has {self.lilac}**{in_pool}** in its pool.')
+            return
+        else:
+            amt = None
+            try:
+                amt = int(args[0])
+            except ValueError:
+                raise commands.errors.BadArgument()
         
-        if amt > self.bot.economy[user.id]['balance']:
-            await ctx.send(f':warning: You don\'t have enough {self.lilac} to make that pool contribution!')
-            return
-        if amt < 0:
-            await ctx.send(f':warning: You can\'t put a negative number of {self.lilac} into the pool!')
-            return
+            if amt > self.bot.economy[user.id]['balance']:
+                await ctx.send(f':warning: You don\'t have enough {self.lilac} to make that pool contribution!')
+                return
+            if amt < 0:
+                await ctx.send(f':warning: You can\'t put a negative number of {self.lilac} into the pool!')
+                return
 
-        self.bot.economy[user.id]['balance'] -= amt
-        self.bot.economy['pools'][guild.id] += amt
-        self.update_file()
+            self.bot.economy[user.id]['balance'] -= amt
+            self.bot.economy['pools'][guild.id] += amt
+            self.update_file()
 
-        await ctx.send(f':white_check_mark: I\'ve put {self.lilac}**{amt}** from your'+\
-                        ' account into the pool!')
+            await ctx.send(f':white_check_mark: I\'ve put {self.lilac}**{amt}** from your'+\
+                            ' account into the pool!')
             
     @commands.command()
     @manage_guild()
@@ -161,8 +172,10 @@ class Economy:
         if gods_like != 0:
             take_away = random.randrange(0, 500)
             self.bot.economy[user.id]['balance'] -= take_away
-            bal = self.bot.economy[user.id]['balance']
+            if self.bot.economy[user.id]['balance'] < -5:
+                self.bot.economy[user.id]['balance'] = -5
 
+            bal = self.bot.economy[user.id]['balance']
             await ctx.send(f':exclamation: The gods don\'t like your offering of {self.lilac}**{amount}**!\n' +\
                            f'They take away {self.lilac}**{take_away}** from you, leaving you with' +\
                            f' {self.lilac}**{bal}**!')
