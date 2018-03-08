@@ -414,10 +414,10 @@ class Mod:
         
         async for message in ctx.message.channel.history(limit=number):
             await message.delete()
-            asyncio.sleep(0.2)
+            await asyncio.sleep(0.2)
 
         notif_msg = await ctx.send(f':white_check_mark: I\'ve purged {number} messages for you!')
-        asyncio.sleep(7.0)
+        await asyncio.sleep(7.0)
         await notif_msg.delete()
 
 def setup(bot):
