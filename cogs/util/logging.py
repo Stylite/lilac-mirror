@@ -8,6 +8,7 @@ class Logger:
 
     def get_log(self, count):
         if count > len(self.logs):
+			print(repr(''.join(self.logs)))
             return ''.join(self.logs)
         else:
             to_return = self.logs[-1*count:]
