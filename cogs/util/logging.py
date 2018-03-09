@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import sys
 
 """Logger used to log messages to console."""
 
@@ -14,7 +15,9 @@ class Logger:
             return ''.join(to_return)
 
     def write(self, data):
-        self.logs.append(data.strip() + '\n')
+        self.logs.append(data)
+        sys.__stdout__.write(data)
 
     def log(self, tag, message):
         print(f'[{tag}] {message}')
+        
