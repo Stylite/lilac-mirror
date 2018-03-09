@@ -192,7 +192,7 @@ class Economy:
         self.update_file()
 
     @commands.command()
-    async def give(self, ctx, *, user_mention: str, amt: int):
+    async def give(self, ctx, user_mention: str, amt: int):
         user = ctx.message.author
         give_to = None
         if len(ctx.message.mentions) == 0:
