@@ -81,7 +81,10 @@ class Dev:
             outerr = pull_process.stderr
 
         output = '\n+ '.join(output.decode().splitlines())
-        outerr = '\n- '.join(outerr.decode().splitlines())
+        if outerr is not None:
+            outerr = '\n- '.join(outerr.decode().splitlines())
+        else:
+            outerr = ''
         await ctx.send(f'**Git Response:** ```{output}{outerr}```')
 
     @commands.command(aliases=['bl'])
