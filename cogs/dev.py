@@ -83,7 +83,7 @@ class Dev:
         output = '\n+ '.join(output.decode().splitlines())
         print(output)
         print(outerr)
-        if not isinstance(outerr, NoneType):
+        if not outerr is None:
             outerr = '\n- '.join(outerr.decode().splitlines())
         else:
             outerr = ''
