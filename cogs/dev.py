@@ -81,7 +81,9 @@ class Dev:
             outerr = pull_process.stderr
 
         output = '\n+ '.join(output.decode().splitlines())
-        if not isinistance(outerr, NoneType):
+        print(output)
+        print(outerr)
+        if not isinstance(outerr, NoneType):
             outerr = '\n- '.join(outerr.decode().splitlines())
         else:
             outerr = ''
