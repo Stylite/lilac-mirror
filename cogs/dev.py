@@ -189,5 +189,18 @@ class Dev:
         logs = self.bot.logger.get_log(count)
         await ctx.send(f'Here are the last **{count}** log items:\n```css\n{logs}\n```')
 
+    @commands.command()
+    @is_cleared()
+    async def editmoney(self, ctx, user_id: int, amt: int):
+        if user_id not in self.bot.economy:
+            await ctx.send(':x: That user does not have a Lilac bank account.')
+            return
+
+        self.bot.economy[user_id]['balance'] += amt
+        new_bal = self.bot.economy[user_id]['balance']
+
+        await ctx.send(f'```self.bot.economy[{user_id}][\'balance\'] += {amt} ->\n'+\
+                        f'{user_id} now has {new_bal}```')
+
 def setup(bot):
     bot.add_cog(Dev(bot))

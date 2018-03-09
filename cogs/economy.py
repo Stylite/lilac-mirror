@@ -216,6 +216,5 @@ class Economy:
                         f' from your account into **{give_to.name}**\'s account!')
         
 
-
 def setup(bot):
     bot.add_cog(Economy(bot))

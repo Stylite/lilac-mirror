@@ -126,11 +126,11 @@ class Misc:
                     break
 
             if found == [False, False]:
-                ctx.send('Sorry, but I couldn\'t find that category/command!')
+                await ctx.send('Sorry, but I couldn\'t find that category/command!')
                 return
 
         else:
-            ctx.send(':warning: Too many arguments.')
+            await ctx.send(':warning: Too many arguments.')
             return
 
         await ctx.send(embed=send)
