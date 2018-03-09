@@ -80,11 +80,11 @@ class Dev:
             output = pull_process.stdout
             outerr = pull_process.stderr
 
-        output = '+' + '\n+ '.join(output.decode().splitlines())
+        output = '+ ' + '\n+ '.join(output.decode().splitlines())
         print(output)
         print(outerr)
         if not outerr is None:
-            outerr = '-' + '\n- '.join(outerr.decode().splitlines())
+            outerr = '- ' + '\n- '.join(outerr.decode().splitlines())
         else:
             outerr = ''
         await ctx.send(f'**Git Response:** ```diff{output}{outerr}```')
