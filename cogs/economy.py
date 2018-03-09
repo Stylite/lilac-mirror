@@ -160,7 +160,7 @@ class Economy:
         if user.id not in self.bot.economy:
             self.create_bank_account(user)
         if amount > self.bot.economy[user.id]['balance']:
-            await ctx.send(':warning: You don\'t have enough money to make that tribute!')
+            await ctx.send(f':warning: You don\'t have enough {self.lilac} to make that tribute!')
             return
         if amount < 0:
             await ctx.send(f':warning: You can\'t tribute less than {self.lilac}**0**!')
@@ -190,6 +190,31 @@ class Economy:
                            f' {self.lilac}**{bal}**!')
 
         self.update_file()
+
+    @commands.command()
+    async def give(self, ctx, *, user_mention: str, amt: int):
+        user = ctx.message.author
+        give_to = None
+        if len(ctx.message.mentions) == 0:
+            await ctx.send(f':warning: You must mention a user to give {self.lilac} to!')
+            return
+        else:
+            give_to = ctx.message.mentions[0]
+
+        if self.bot.economy[user.id]['balance'] < amt:
+            await ctx.send(f':warning: You don\'t have enough {self.lilac} to make that transaction!')
+            return
+
+        if give_to.id not in self.bot.economy:
+            self.create_bank_account(give_to)
+
+        self.bot.economy[user.id]['balance'] -= amt
+        self.bot.economy[give_to.id]['balance'] += amt
+        self.update_file()
+
+        await ctx.send(f':white_check_mark: I\'ve transferred {self.lilac}**{amt}**'+\
+                        f' from your account into **{give_to.name}**\'s account!')
+        
 
 
 def setup(bot):
