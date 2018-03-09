@@ -67,18 +67,22 @@ class Dev:
         await ctx.send(':warning: Pulling from Git! This will overwrite all local changes!')
 
         output = []
+        outerr = []
         if sys.platform == 'win32':
-            fetch_process = subprocess.run(
+            pull_process = subprocess.run(
                 'git pull origin master', stdout=subprocess.PIPE)
 
-            output = fetch_process.stdout
+            output = pull_process.stdout
+            outerr = pull_process.stderr
         else:
-            fetch_process = await asyncio.create_subprocess_exec('git', 'pull', 'origin', 'master',
+            pull_process = await asyncio.create_subprocess_exec('git', 'pull', 'origin', 'master',
                                                                  stdout=subprocess.PIPE)
-            output = fetch_process.stdout
+            output = pull_process.stdout
+            outerr = pull_process.stderr
 
-        output = '\n'.join(output.decode().splitlines())
-        await ctx.send('**Git Response:** ```{}```'.format(output))
+        output = '\n+ '.join(output.decode().splitlines())
+        outerr = '\n- '.join(outerr.decode().splitlines())
+        await ctx.send(f'**Git Response:** ```{output}{outerr}```')
 
     @commands.command(aliases=['bl'])
     @is_cleared()
