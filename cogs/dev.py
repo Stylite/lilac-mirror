@@ -87,7 +87,7 @@ class Dev:
             outerr = '- ' + '\n- '.join(outerr.decode().splitlines())
         else:
             outerr = ''
-        await ctx.send(f'**Git Response:** ```diff{output}{outerr}```')
+        await ctx.send(f'**Git Response:** ```diff\n{output}{outerr}```')
 
     @commands.command(aliases=['bl'])
     @is_cleared()
