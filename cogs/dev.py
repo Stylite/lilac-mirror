@@ -204,7 +204,7 @@ class Dev:
             try:
                 res = eval(string)
             except NameError as e:
-                return string
+                return f'"{string}"'
             else:
                 return res
 
@@ -215,12 +215,16 @@ class Dev:
                 to_eval += f'[{key}]'
             to_eval += f' = {val}'
             exec(to_eval)
+            print(to_eval)
+            print(d)
 
             return d
             
         yml_file = yaml.load(open(file_name, 'r'))
-        edit_dict(yml_file, [safe_eval(k) for k in key.split('|')], safe_eval(val))
+        yml_file = edit_dict(yml_file, [safe_eval(k) for k in key.split('|')], \
+                            safe_eval(val))
         yaml.dump(yml_file, open(file_name, 'w'))
+        self.bot.load_files()
 
         await ctx.send(
             ':white_check_mark:'+\
