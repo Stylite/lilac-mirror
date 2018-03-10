@@ -215,8 +215,6 @@ class Dev:
                 to_eval += f'[{key}]'
             to_eval += f' = {val}'
             exec(to_eval)
-            print(to_eval)
-            print(d)
 
             return d
             
