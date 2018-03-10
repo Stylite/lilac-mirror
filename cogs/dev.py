@@ -70,13 +70,14 @@ class Dev:
         outerr = []
         if sys.platform == 'win32':
             pull_process = subprocess.run(
-                'git pull origin master', stdout=subprocess.PIPE)
+                'git pull origin master', stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
             output = pull_process.stdout
             outerr = pull_process.stderr
         else:
             pull_process = await asyncio.create_subprocess_exec('git', 'pull', 'origin', 'master',
-                                                                 stdout=subprocess.PIPE)
+                                                                 stdout=subprocess.PIPE, \
+                                                                 stderr=subprocess.PIPE)
             output = pull_process.stdout
             outerr = pull_process.stderr
 
