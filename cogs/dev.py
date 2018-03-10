@@ -193,14 +193,33 @@ class Dev:
 
     @commands.command()
     @is_cleared()
-    async def edityml(self, ctx, file_name: str, key: int, val: int):
+    async def edityml(self, ctx, file_name: str, key: str, val: str):
         """Edits the content of a YML file.
         
         Do not edit the contents of config.yml with this
         command."""
+        def safe_eval(string):
+            """Safely evaluates an int, bool, str, etc."""
+            res = None
+            try:
+                res = eval(string)
+            except NameError as e:
+                return string
+            else:
+                return res
 
+        def edit_dict(d, keys, val):
+            """Edits a value from a dict from a list of keys."""
+            to_eval = 'd'
+            for key in keys:
+                to_eval += f'[{key}]'
+            to_eval += f' = {val}'
+            exec(to_eval)
+
+            return d
+            
         yml_file = yaml.load(open(file_name, 'r'))
-        yml_file[key] = val
+        edit_dict(yml_file, [safe_eval(k) for k in key.split('|')], safe_eval(val))
         yaml.dump(yml_file, open(file_name, 'w'))
 
         await ctx.send(
