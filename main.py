@@ -104,7 +104,7 @@ class Lilac(commands.AutoShardedBot):
 
     async def on_ready(self):
         """Function executes once a shard is ready."""
-        shard_ready = len(self.shards)
+        shard_ready = len(self.shards)-1
         self.logger.log('INFO', f'Shard {shard_ready} is ready!')
 
         await self.change_presence(activity=discord.Game(name=f",help | Shard {shard_ready}"), \
