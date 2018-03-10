@@ -4,6 +4,7 @@ import os
 import subprocess
 import asyncio
 import importlib as il
+import yaml
 
 from discord.ext import commands
 import discord
@@ -192,16 +193,22 @@ class Dev:
 
     @commands.command()
     @is_cleared()
-    async def editmoney(self, ctx, user_id: int, amt: int):
-        if user_id not in self.bot.economy:
-            await ctx.send(':x: That user does not have a Lilac bank account.')
-            return
+    async def edityml(self, ctx, file_name: str, key: int, val: int):
+        """Edits the content of a YML file.
+        
+        Do not edit the contents of config.yml with this
+        command."""
 
-        self.bot.economy[user_id]['balance'] += amt
-        new_bal = self.bot.economy[user_id]['balance']
+        yml_file = yaml.load(open(file_name, 'r'))
+        yml_file[key] = val
+        yaml.dump(yml_file, open(file_name, 'w'))
 
-        await ctx.send(f'```self.bot.economy[{user_id}][\'balance\'] += {amt} ->\n'+\
-                        f'{user_id} now has {new_bal}```')
+        await ctx.send(
+            ':white_check_mark:'+\
+            '```'+\
+            f'"{file_name}"[{key}] = {val}'+\
+            '```'
+        )
 
 def setup(bot):
     bot.add_cog(Dev(bot))
