@@ -38,7 +38,8 @@ class Lilac(commands.AutoShardedBot):
 
         super().__init__(
             command_prefix='',
-            description='A bot made for moderation, fun, and verifying KnowYourMeme accounts with Discord.'
+            description='A bot made for moderation, fun, and verifying KnowYourMeme accounts with Discord.',
+            shard_count=2
         )
 
     def create_data_files(self):
@@ -102,12 +103,12 @@ class Lilac(commands.AutoShardedBot):
             return ","
 
     async def on_ready(self):
-        """Function executes once shard is ready."""
-        self.logger.log('INFO', f'Lilac is ready!')
+        """Function executes once a shard is ready."""
+        shard_ready = len(self.shards)
+        self.logger.log('INFO', f'Shard {shard_ready} is ready!')
 
-        for shard_id in self.shard_ids:
-            await self.change_presence(activity=discord.Game(name=f",help | Shard {shard_id}"), \
-                                        shard_id=shard_id)
+        await self.change_presence(activity=discord.Game(name=f",help | Shard {shard_ready}"), \
+                                    shard_id=shard_ready)
 
     async def on_command_error(self, ctx, exception):
         """Function executes once bot encounters an error"""
