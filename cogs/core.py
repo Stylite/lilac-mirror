@@ -40,7 +40,7 @@ class Core:
         cmdsexec = self.bot.info['commands']
         memuse = str(round(psutil.Process(os.getpid()).memory_info().rss/1000000, 1)) + ' MB'
         shardnum = ctx.message.guild.shard_id
-        uptime = str(round((time.time() - self.bot.up_at)/60000, 1)) + ' min'
+        uptime = str(round((time.time() - self.bot.up_at)/60, 1)) + ' min'
         guildcount = len(self.bot.guilds)
         usercount = len(self.bot.users)
 

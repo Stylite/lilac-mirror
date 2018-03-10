@@ -107,8 +107,7 @@ class Lilac(commands.AutoShardedBot):
         shard_ready = len(self.shards)-1
         self.logger.log('INFO', f'Shard {shard_ready} is ready!')
 
-        await self.change_presence(activity=discord.Game(name=f",help | Shard {shard_ready}"), \
-                                    shard_id=shard_ready)
+        await self.change_presence(activity=discord.Game(name=f",help"))
 
     async def on_command_error(self, ctx, exception):
         """Function executes once bot encounters an error"""
