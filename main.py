@@ -1,8 +1,10 @@
 #!/usr/bin/env python
-import yaml
-import traceback
+import time
 import os
 import sys
+import traceback
+
+import yaml
 from cogs.util.logging import Logger
 
 from discord.ext import commands
@@ -15,6 +17,7 @@ class Lilac(commands.AutoShardedBot):
     """Bot class for Lilac."""
 
     DATAFILES = [
+        'data/info.yml',
         'data/welcomes.yml',
         'data/goodbyes.yml',
         'data/autoroles.yml',
@@ -30,6 +33,8 @@ class Lilac(commands.AutoShardedBot):
         self.logger = Logger()
         sys.stderr = self.logger
         sys.stdout = self.logger
+
+        self.up_at = time.time()
 
         super().__init__(
             command_prefix='',
@@ -65,6 +70,7 @@ class Lilac(commands.AutoShardedBot):
                 'The config.yml file is not present; reclone Lilac.')
 
         self.config = {}
+        self.info = {}
         self.welcomes, self.goodbyes = {}, {}
         self.autoroles, self.selfroles = {}, {}
         self.blacklist = list(map(int, [s.strip() for s in open('data/gblacklist.txt')
@@ -72,6 +78,8 @@ class Lilac(commands.AutoShardedBot):
         self.economy = {}
         self.prefixes = {}
 
+        with open('data/info.yml', 'r') as info:
+            self.info = yaml.load(info) 
         with open('config.yml', 'r') as config:
             self.config = yaml.load(config)
         with open('data/welcomes.yml', 'r') as welcomes:
@@ -94,11 +102,12 @@ class Lilac(commands.AutoShardedBot):
             return ","
 
     async def on_ready(self):
-        """Function executes once bot is ready."""
-        self.logger.log('INFO', 'Lilac is ready!')
-        self.logger.log('INFO', f'Logged in as {str(self.user)}')
+        """Function executes once shard is ready."""
+        self.logger.log('INFO', f'Lilac is ready!')
 
-        await self.change_presence(activity=discord.Game(name="default prefix is ,"))
+        for shard_id in self.shard_ids:
+            await self.change_presence(activity=discord.Game(name=f",help | Shard {shard_id}"), \
+                                        shard_id=shard_id)
 
     async def on_command_error(self, ctx, exception):
         """Function executes once bot encounters an error"""
@@ -185,6 +194,10 @@ class Lilac(commands.AutoShardedBot):
             return
         else:
             await self.process_commands(message)
+
+    async def on_command(self, ctx):
+        self.info['commands'] += 1
+        yaml.dump(self.info, open('data/info.yml', 'w'))
 
     def run(self):
         """Run function for Lilac. Loads cogs and runs the bot."""

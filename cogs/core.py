@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 import time
+import os
+import psutil
 
 import discord
 from discord.ext import commands
@@ -30,6 +32,27 @@ class Core:
         """Gives you an invite to the support server."""
         to_send = discord.Embed(title="Support Server", description="https://discord.gg/EcW7kfa",\
                                 colour=0xbd8cbf)
+        await ctx.send(embed=to_send)
+    
+    @commands.command()
+    async def info(self, ctx):
+        """Gives you statistics about the bot."""
+        cmdsexec = self.bot.info['commands']
+        memuse = str(round(psutil.Process(os.getpid()).memory_info().rss/1000000, 1)) + ' MB'
+        shardnum = ctx.message.guild.shard_id
+        uptime = str(round((time.time() - self.bot.up_at)/60000, 1)) + ' min'
+        guildcount = len(self.bot.guilds)
+        usercount = len(self.bot.users)
+
+        to_send = discord.Embed(title="Lilac Info/Stats", description="Statistics and information about Lilac.", color=0xbd8cbf)
+        to_send.set_thumbnail(url="https://cdn.discordapp.com/avatars/405231585051410442/297df0d5c6f0cfbbaed347e4832d23fa.jpg?size=2048")
+        to_send.add_field(name="Commands Executed", value=cmdsexec, inline=True)
+        to_send.add_field(name="Memory Usage", value=memuse, inline=True)
+        to_send.add_field(name="Shard #", value=shardnum, inline=True)
+        to_send.add_field(name="Uptime", value=uptime, inline=True)
+        to_send.add_field(name="Guilds", value=guildcount, inline=True)
+        to_send.add_field(name="Users", value=usercount, inline=True)
+
         await ctx.send(embed=to_send)
 
 
