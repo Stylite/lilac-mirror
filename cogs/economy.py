@@ -96,7 +96,7 @@ class Economy:
             await ctx.send(':x: This guild is not currently hosting a pool event!')
             return
 
-        winner = random.choice(guild.members)
+        winner = random.choice([m for m in guild.members if not m.bot])
         pool_total = self.bot.economy['pools'][guild.id]
 
         await ctx.send(f'{winner.mention} has won the pool! {self.lilac}**{pool_total}** goes to them!')
