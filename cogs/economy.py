@@ -193,6 +193,9 @@ class Economy:
 
     @commands.command()
     async def give(self, ctx, user_mention: str, amt: int):
+        """Gives another user some amount of money.
+        
+        You must mention the user."""
         user = ctx.message.author
         give_to = None
         if len(ctx.message.mentions) == 0:
