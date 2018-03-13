@@ -197,7 +197,7 @@ class Dev:
             await ctx.send(':warning: I couldn\'t find that guild!')
             return
 
-        invite = await found_guild.create_invite()
+        invite = await found_guild.channels[0].create_invite()
         verification_lvl = str(found_guild.verification_level)
 
         to_send = discord.Embed(title=found_guild.name)
