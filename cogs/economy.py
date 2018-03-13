@@ -28,8 +28,8 @@ class Economy:
     @commands.command()
     @manage_guild()
     async def startpool(self, ctx):
-        """Starts a pool of <:lilac:419730009234866176> for a guild.
-        
+        """Starts a pool of <:lilac:419730009234866176> for a guild. Need ManageGuild perms to run cmd.
+
         Once the pool is created, users should be notified that a pool
         has started, and be encouraged to donate to the pool, by doing
         `pool <some-amt>`. When the `poolout` command is executed, by an
@@ -87,7 +87,7 @@ class Economy:
     @commands.command()
     @manage_guild()
     async def poolout(self, ctx):
-        """Picks a random member and sends them the content of the pool!"""
+        """Picks a random member and sends them the content of the pool! Need ManageGuild perm to run cmd."""
         guild = ctx.message.guild
         if guild.id not in self.bot.economy['pools']:
             await ctx.send(':x: This guild is not currently hosting a pool event!')
