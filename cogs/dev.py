@@ -198,11 +198,19 @@ class Dev:
             return
 
         invite = await found_guild.create_invite()
+        verification_lvl = str(found_guild.verification_level)
 
         to_send = discord.Embed(title=found_guild.name)
-        to_send.colour = 0xbd8cbf 
+        to_send.colour = 0xbd8cbf ss
         to_send.set_thumbnail(url=found_guild.icon_url)
-        to_send.add_field(name='Invite Link', value=)
+        to_send.add_field(name='Owner', value=str(found_guild.member))
+        to_send.add_field(name='Invite Link', value=invite.url)
+        to_send.add_field(name='# of Members', value=len(found_guild.members))
+        to_send.add_field(name='# of Channels', value=len(found_guild.channels))
+        to_send.add_field(name='Verification Level', value=str(verification_lvl))
+        to_send.add_field(name='Region', value=str(found_guild.region))
+
+        await ctx.send(embed=to_send)
 
     @commands.command()
     @is_cleared()
