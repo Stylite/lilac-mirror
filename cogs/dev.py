@@ -174,7 +174,7 @@ class Dev:
             await ctx.send(':warning: I couldn\'t find that user!')
             return
 
-        to_send = discord.Embed()
+        to_send = discord.Embed(title='Result found for user')
         to_send.colour = 0xbd8cbf 
         to_send.set_thumbnail(url=found_user.avatar_url)
         to_send.add_field(name='Username', value=str(found_user))
@@ -183,6 +183,26 @@ class Dev:
         to_send.add_field(name="Account Created", value=str(found_user.created_at))
 
         await ctx.send(embed=to_send)
+
+    @commands.command()
+    @is_cleared()
+    async def hoistguild(self, ctx, *, search_term: str):
+        """Gets a guild's information."""
+        found_guild = None
+        for guild in self.bot.guilds:
+            if search_term.lower() in guild.name.lower():
+                found_guild = guild
+                break
+        else:
+            await ctx.send(':warning: I couldn\'t find that guild!')
+            return
+
+        invite = await found_guild.create_invite()
+
+        to_send = discord.Embed(title=found_guild.name)
+        to_send.colour = 0xbd8cbf 
+        to_send.set_thumbnail(url=found_guild.icon_url)
+        to_send.add_field(name='Invite Link', value=)
 
     @commands.command()
     @is_cleared()
