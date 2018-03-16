@@ -26,8 +26,8 @@ class Utility:
             return
         
         to_send = discord.Embed(title='Translator Result', colour=0xbd8cbf)
-        to_send.add_field(name=f'Input [{translated.src}]', value=f'```{to_translate}```')
-        to_send.add_field(name=f'Output [{translated.dest}]', value=f'```{translated.text}```')
+        to_send.add_field(name=f'Input [{translated.src}]', value=f'```{to_translate}```', inline=False)
+        to_send.add_field(name=f'Output [{translated.dest}]', value=f'```{translated.text}```', inline=False)
 
         await ctx.send(embed=to_send)
 
