@@ -221,6 +221,20 @@ class Dev:
 
     @commands.command()
     @is_cleared()
+    async def cmd(self, ctx, *, command: str):
+        """Executes a command in CMD.
+        
+        [Windows]"""
+        try:
+            os.system(command)
+        except Exception as e:
+            await ctx.send(f':warning: Error occured in executing command: `{str(e)}`')
+        else:
+            await ctx.send(':white_check_mark: Successfully executed command.')
+        
+
+    @commands.command()
+    @is_cleared()
     async def edityml(self, ctx, file_name: str, key: str, val: str):
         """Edits the content of a YML file.
         
