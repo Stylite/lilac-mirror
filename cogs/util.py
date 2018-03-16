@@ -9,6 +9,7 @@ class Utility:
         self.bot = bot
         self.translator = googletrans.Translator()
 
+    @commands.command()
     async def translate(self, ctx, translate_to: str, *, to_translate: str):
         """Translates something from one language to another.
         
