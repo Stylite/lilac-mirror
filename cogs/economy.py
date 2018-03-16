@@ -185,14 +185,14 @@ class Economy:
             self.bot.economy[user.id]['balance'] += give_to
             bal = self.bot.economy[user.id]['balance']
 
-            await ctx.send(f':thumbsup: The gods love your offering of {amount}!\n' +\
+            await ctx.send(f':thumbsup: The gods love your offering of {self.lilac}**{amount}**!\n' +\
                            f'They give you {self.lilac}**{give_to}**, leaving you with' +\
                            f' {self.lilac}**{bal}**!')
 
         self.update_file()
 
     @commands.command()
-    async def give(self, ctx, user_mention: str, amt: int):
+    async def give(self, ctx, amt: int, user_mention: str):
         """Gives another user some amount of money.
         
         You must mention the user."""
