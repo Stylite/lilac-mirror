@@ -25,7 +25,9 @@ class Core:
 
         Do not spam the form!"""
         await ctx.send('__**Feedback & Bug Reporting Form:**__\nhttps://goo.gl/forms/jMmS8JPg1CX4E0Li2' +
-                       '\n\n**__Valid__** feedback would be greatly appreciated!')
+                       '\n\n**__Valid__** feedback would be greatly appreciated!\n\n'+\
+                       'You can also make suggestions or bug reports by visiting our support server, '+\
+                       'which you can get an invite to by doing `support`')
 
     @commands.command()
     async def support(self, ctx):

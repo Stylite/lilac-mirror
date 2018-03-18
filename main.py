@@ -39,7 +39,7 @@ class Lilac(commands.AutoShardedBot):
         super().__init__(
             command_prefix='',
             description='A bot made for moderation, fun, and verifying KnowYourMeme accounts with Discord.',
-            shard_count=2
+            shard_count=1
         )
 
     def create_data_files(self):
