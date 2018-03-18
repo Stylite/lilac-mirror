@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import sys
 import os
-import inspect
 import subprocess
 import asyncio
 import importlib as il
@@ -50,10 +49,12 @@ class Dev:
     async def debug(self, ctx, *, code: str):
         """Executes some code."""
         try:
-            res = eval(code)
+            to_exec = 'async def func(ctx):\n'
+            for line in code.splitlines():
+                to_exec += f'  {line}\n'
+            exec(to_exec)
 
-            if inspect.isawaitable(res):
-                await res
+            res = await func(ctx)
         except Exception as e:
             await ctx.send(f':warning: Error: ```{str(e)}```')
             return
