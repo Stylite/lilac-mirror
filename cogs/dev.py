@@ -49,17 +49,23 @@ class Dev:
     async def debug(self, ctx, *, code: str):
         """Executes some code."""
         try:
+            env = {}
             to_exec = 'async def func(ctx):\n'
             for line in code.splitlines():
                 to_exec += f'  {line}\n'
-            exec(to_exec)
 
+            exec(to_exec, env)
+
+            func = env['func']
             res = await func(ctx)
         except Exception as e:
             await ctx.send(f':warning: Error: ```{str(e)}```')
             return
         else:
-            await ctx.send(f':white_check_mark: Execution successful. Result: ```{str(res)}```')
+            if res is None:
+                await ctx.message.add_reaction('✅')
+            else:
+                await ctx.send(f':white_check_mark: Executed successfully. ```{ress}```')
 
     @commands.command(aliases=['pgit'])
     @is_cleared()
