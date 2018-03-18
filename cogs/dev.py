@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import sys
 import os
+import inspect
 import subprocess
 import asyncio
 import importlib as il
@@ -47,22 +48,17 @@ class Dev:
     @commands.command(aliases=['evaluate'])
     @is_cleared()
     async def debug(self, ctx, *, code: str):
-        """Executes some code.
-        
-        If your code is multiline, **INDENT WITH TWO SPACES**."""
+        """Executes some code."""
         try:
-            to_exec = 'async def func(ctx):\n'
-            for line in code.splitlines():
-                to_exec += f'  {line}\n'
-            to_exec += '\nawait func(ctx)'
+            res = eval(code)
 
-            res = exec(to_exec)
+            if inspect.isawaitable(res):
+                await res
         except Exception as e:
             await ctx.send(f':warning: Error: ```{str(e)}```')
             return
         else:
-            await ctx.send(f':white_check_mark: Execution successful. Result: ```{str(res)}```'+\
-                            'You will most likely receive `None` as the returned result; this is normal.')
+            await ctx.send(f':white_check_mark: Execution successful. Result: ```{str(res)}```')
 
     @commands.command(aliases=['pgit'])
     @is_cleared()
