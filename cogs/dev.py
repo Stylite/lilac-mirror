@@ -65,7 +65,7 @@ class Dev:
             if res is None:
                 await ctx.message.add_reaction('✅')
             else:
-                await ctx.send(f':white_check_mark: Executed successfully. ```{ress}```')
+                await ctx.send(f':white_check_mark: Executed successfully. ```{res}```')
 
     @commands.command(aliases=['pgit'])
     @is_cleared()
