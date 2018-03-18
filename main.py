@@ -198,7 +198,7 @@ class Lilac(commands.AutoShardedBot):
     async def on_command(self, ctx):
         if 'commands' not in self.info:
             self.info['commands'] = 0
-            
+
         self.info['commands'] += 1
         yaml.dump(self.info, open('data/info.yml', 'w'))
 

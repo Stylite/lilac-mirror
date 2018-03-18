@@ -47,9 +47,16 @@ class Dev:
     @commands.command(aliases=['evaluate'])
     @is_cleared()
     async def debug(self, ctx, *, code: str):
-        """Executes some code."""
+        """Executes some code.
+        
+        If your code is multiline, **INDENT WITH TWO SPACES**."""
         try:
-            res = exec(code)
+            to_exec = 'async def func(ctx):\n'
+            for line in code.splitlines():
+                to_exec += f'  {line}\n'
+            to_exec += '\nawait func(ctx)'
+
+            res = exec(to_exec)
         except Exception as e:
             await ctx.send(f':warning: Error: ```{str(e)}```')
             return
