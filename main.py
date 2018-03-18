@@ -190,6 +190,8 @@ class Lilac(commands.AutoShardedBot):
         user_executing = message.author
         if user_executing.id in self.blacklist:  # check if user is blacklisted
             return
+        elif user_executing.bot:
+            return
         elif isinstance(message.channel, discord.DMChannel):
             return
         else:
