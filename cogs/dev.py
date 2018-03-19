@@ -44,6 +44,11 @@ class Dev:
         os.execl(sys.executable, sys.executable, * sys.argv)
         await ctx.send(':white_check_mark: Done rebooting!')
 
+    @commands.command(aliases=['shutdown'])
+    async def shutoff(self, ctx):
+        await ctx.send(':white_check_mark: Shutting down!')
+        sys.exit()
+
     @commands.command(aliases=['evaluate'])
     @is_cleared()
     async def debug(self, ctx, *, code: str):

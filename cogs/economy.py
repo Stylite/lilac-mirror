@@ -178,6 +178,7 @@ class Economy:
         self.check_bank_account(user)
 
         dbcur = self.bot.database.cursor()
+
         dbcur.execute(f'SELECT * FROM economy WHERE id={user.id}')
         current_bal = dbcur.fetchall()[0][1]
         if amount > current_bal:
@@ -223,6 +224,8 @@ class Economy:
         
         You must mention the user."""
         user = ctx.message.author
+        self.check_bank_account(user)
+
         give_to = None
         if len(ctx.message.mentions) == 0:
             await ctx.send(f':warning: You must mention a user to give {self.lilac} to!')
@@ -230,19 +233,25 @@ class Economy:
         else:
             give_to = ctx.message.mentions[0]
 
-        if self.bot.economy[user.id]['balance'] < amt:
+        dbcur = self.bot.database.cursor()
+
+        dbcur.execute(f'SELECT * FROM economy WHERE id={user.id}')
+        user_bal = dbcur.fetchall()[0][1]
+        if user_bal < amt:
             await ctx.send(f':warning: You don\'t have enough {self.lilac} to make that transaction!')
             return
 
-        if give_to.id not in self.bot.economy:
-            self.create_bank_account(give_to)
+        self.check_bank_account(give_to)
 
-        self.bot.economy[user.id]['balance'] -= amt
-        self.bot.economy[give_to.id]['balance'] += amt
-        self.update_file()
+        dbcur.execute(f'UPDATE economy SET balance=balance-{amt} WHERE id={user.id}')
+        dbcur.execute(f'UPDATE economy SET balance=balance+{amt} WHERE id={give_to.id}')
+
+        self.bot.database.commit()
+        dbcur.close()
 
         await ctx.send(f':white_check_mark: I\'ve transferred {self.lilac}**{amt}**'+\
                         f' from your account into **{give_to.name}**\'s account!')
+
         
 
 def setup(bot):
