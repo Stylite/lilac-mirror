@@ -175,9 +175,12 @@ class Economy:
         Yes, you can be left with a negative amount of money, but it's capped
         at -5."""
         user = ctx.message.author
-        if user.id not in self.bot.economy:
-            self.create_bank_account(user)
-        if amount > self.bot.economy[user.id]['balance']:
+        self.check_bank_account(user)
+
+        dbcur = self.bot.database.cursor()
+        dbcur.execute(f'SELECT * FROM economy WHERE id={user.id}')
+        current_bal = dbcur.fetchall()[0][1]
+        if amount > current_bal:
             await ctx.send(f':warning: You don\'t have enough {self.lilac} to make that tribute!')
             return
         if amount < 0:
@@ -185,29 +188,34 @@ class Economy:
             return 
 
         random.seed(str(amount) + str(time.time()))
-        self.bot.economy[user.id]['balance'] -= amount 
+        dbcur.execute(f'UPDATE economy SET balance=balance-{amount} WHERE id={user.id}')
 
         gods_like = random.randrange(0, 4)
         if gods_like != 0:
             take_away = random.randrange(0, 500)
-            self.bot.economy[user.id]['balance'] -= take_away
-            if self.bot.economy[user.id]['balance'] < -5:
-                self.bot.economy[user.id]['balance'] = -5
+            dbcur.execute(f'UPDATE economy SET balance=balance-{take_away} WHERE id={user.id}')
 
-            bal = self.bot.economy[user.id]['balance']
+            dbcur.execute(f'SELECT * FROM economy WHERE id={user.id}')
+            if dbcur.fetchall()[0][1] < -5:
+                dbcur.execute(f'UPDATE economy SET balance=-5 WHERE id={user.id}')
+
+            dbcur.execute(f'SELECT * FROM economy WHERE id={user.id}')
+            bal = dbcur.fetchall()[0][1]
             await ctx.send(f':exclamation: The gods don\'t like your offering of {self.lilac}**{amount}**!\n' +\
                            f'They take away {self.lilac}**{take_away}** from you, leaving you with' +\
                            f' {self.lilac}**{bal}**!')
         else:
             give_to = random.randrange(0, 1000)
-            self.bot.economy[user.id]['balance'] += give_to
-            bal = self.bot.economy[user.id]['balance']
+            dbcur.execute(f'UPDATE economy SET balance=balance+{give_to} WHERE id={user.id}')
+            dbcur.execute(f'SELECT * FROM economy WHERE id={user.id}')
+            bal = dbcur.fetchall()[0][1]
 
             await ctx.send(f':thumbsup: The gods love your offering of {self.lilac}**{amount}**!\n' +\
                            f'They give you {self.lilac}**{give_to}**, leaving you with' +\
                            f' {self.lilac}**{bal}**!')
 
-        self.update_file()
+        self.bot.database.commit()
+        dbcur.close()
 
     @commands.command()
     async def give(self, ctx, amt: int, user_mention: str):
