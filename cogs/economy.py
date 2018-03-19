@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import random
-import yaml
 import time
 from cogs.util.checks import manage_guild
 
@@ -100,7 +99,7 @@ class Economy:
                 return
 
             dbcur.execute(f'UPDATE economy SET balance=balance-{amt} WHERE id={user.id}')
-            dbcur.exectue(f'UPDATE pools SET pool=pool+{amt} WHERE id={guild.id}')
+            dbcur.execute(f'UPDATE pools SET pool=pool+{amt} WHERE id={guild.id}')
 
             dbcur.close()
             self.bot.database.commit()
