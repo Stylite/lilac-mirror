@@ -14,16 +14,28 @@ class Economy:
         self.bot = bot
         self.lilac = '<:lilac:419730009234866176>'
 
-    def update_file(self):
-        yaml.dump(self.bot.economy, open('data/economy.yml', 'w'))
-
+        dbcur = self.bot.database.cursor()
+        dbcur.execute('''
+                CREATE TABLE IF NOT EXISTS 
+                economy(id INTEGER, balance INTEGER, daily REAL)''')
+        dbcur.close()
+        self.bot.database.commit()
+        
     def create_bank_account(self, member):
         """Creates a Lilac bank account."""
-        self.bot.economy[member.id] = {
-            'balance': 0,
-            'daily': 0
-        }
-        self.update_file()
+        dbcur = self.bot.database.cursor()
+        dbcur.execute(
+            '''INSERT INTO economy(id,balance,daily) VALUES (?,?,?)''',
+            (member.id, 0, 0.0))
+        dbcur.close()
+        self.bot.database.commit()
+
+    def check_bank_account(self, member):
+        dbcur = self.bot.database.cursor()
+        dbcur.execute(f'SELECT * FROM economy WHERE id={member.id}')
+        if len(dbcur.fetchall()) == 0:
+            self.create_bank_account(member)
+        dbcur.close()
 
     @commands.command()
     @manage_guild()
@@ -36,7 +48,6 @@ class Economy:
         Admin, the pool's contents will be given to random member of the
         current guild."""
         self.bot.economy['pools'][ctx.message.guild.id] = 0
-        self.update_file()
 
         await ctx.send(f':white_check_mark: I\'ve started a {self.lilac} pool! '+\
                         f'Members of this guild can put some {self.lilac} in the pool by doing '+\
@@ -113,10 +124,13 @@ class Economy:
     async def balance(self, ctx):
         """Gets your balance in <:lilac:419730009234866176>."""
         user = ctx.message.author
-        if user.id not in self.bot.economy:
-            self.create_bank_account(user)
+        self.check_bank_account(user)
 
-        bal = self.bot.economy[user.id]['balance']
+        dbcur = self.bot.database.cursor()
+        dbcur.execute(f'SELECT * FROM economy WHERE id={user.id}')
+        bal = dbcur.fetchall()[0][1]
+        dbcur.close()
+
         await ctx.send(f'**{user.name}**, your balance is {self.lilac}**{bal}**.')
 
     @commands.command()
@@ -125,18 +139,20 @@ class Economy:
 
         Refreshes every 20 hours. """
         user = ctx.message.author
-        if user.id not in self.bot.economy:
-            self.create_bank_account(user)
+        self.check_bank_account(user)
 
-        if time.time() - self.bot.economy[user.id]['daily'] >= 72000:
+        dbcur = self.bot.database.cursor()
+        dbcur.execute(f'SELECT * FROM economy WHERE id={user.id}')
+        daily_last_collected = dbcur.fetchall()[0][2]
+        if time.time() - daily_last_collected >= 72000:
             daily_amt = random.randrange(50, 75)
-            self.bot.economy[user.id]['balance'] += daily_amt
-            self.bot.economy[user.id]['daily'] = time.time()
+            dbcur.execute(f'UPDATE economy SET balance=balance+{daily_amt} WHERE id={user.id}')
+            dbcur.execute(f'UPDATE economy SET daily={time.time()} WHERE id={user.id}')
 
             await ctx.send(f':white_check_mark: **{user.name}**, you collected your' +
                            f' daily of {self.lilac}**{daily_amt}**!')
         else:
-            remain = 72000 - (time.time() - self.bot.economy[user.id]['daily'])
+            remain = 72000 - (time.time() - daily_last_collected)
             remaining = [
                 int((remain - remain % 3600)/3600),
                 int((remain - (int((remain - remain % 3600)/3600)*3600))//60)
@@ -145,7 +161,9 @@ class Economy:
             await ctx.send(f':clock1030: You must wait another **{remaining[0]}** hours' +
                            f' and **{remaining[1]}** minutes before collecting your next daily.')
 
-        self.update_file()
+        self.bot.database.commit()
+        dbcur.close()
+
 
     @commands.command()
     async def tribute(self, ctx, *, amount: int):

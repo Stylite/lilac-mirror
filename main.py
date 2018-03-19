@@ -5,6 +5,7 @@ import sys
 import traceback
 
 import yaml
+import sqlite3 as sqlite
 from cogs.util.logging import Logger
 
 from discord.ext import commands
@@ -17,6 +18,7 @@ class Lilac(commands.AutoShardedBot):
     """Bot class for Lilac."""
 
     DATAFILES = [
+        'data/database.db',
         'data/info.yml',
         'data/welcomes.yml',
         'data/goodbyes.yml',
@@ -76,8 +78,8 @@ class Lilac(commands.AutoShardedBot):
         self.autoroles, self.selfroles = {}, {}
         self.blacklist = list(map(int, [s.strip() for s in open('data/gblacklist.txt')
                                         .readlines()]))
-        self.economy = {}
         self.prefixes = {}
+        self.database = sqlite.connect('data/database.db')
 
         with open('data/info.yml', 'r') as info:
             self.info = yaml.load(info) 
@@ -91,8 +93,6 @@ class Lilac(commands.AutoShardedBot):
             self.autoroles = yaml.load(autoroles)
         with open('data/selfroles.yml', 'r') as selfroles:
             self.selfroles = yaml.load(selfroles)
-        with open('data/economy.yml', 'r') as economy:
-            self.economy = yaml.load(economy)
         with open('data/prefixes.yml', 'r') as prefixes:
             self.prefixes = yaml.load(prefixes)
 
