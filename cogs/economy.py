@@ -18,6 +18,9 @@ class Economy:
         dbcur.execute('''
                 CREATE TABLE IF NOT EXISTS 
                 economy(id INTEGER, balance INTEGER, daily REAL)''')
+        dbcur.execute('''
+                CREATE TABLE IF NOT EXISTS
+                pools(guild_id INTEGER, pool INTEGER)''')
         dbcur.close()
         self.bot.database.commit()
         
@@ -31,6 +34,7 @@ class Economy:
         self.bot.database.commit()
 
     def check_bank_account(self, member):
+        """Checks if user has a bank account."""
         dbcur = self.bot.database.cursor()
         dbcur.execute(f'SELECT * FROM economy WHERE id={member.id}')
         if len(dbcur.fetchall()) == 0:
@@ -47,7 +51,10 @@ class Economy:
         `pool <some-amt>`. When the `poolout` command is executed, by an
         Admin, the pool's contents will be given to random member of the
         current guild."""
-        self.bot.economy['pools'][ctx.message.guild.id] = 0
+        dbcur = self.bot.database.cursor()
+        dbcur.execute('INSERT INTO pools(guild_id,pool) VALUES (?,?)',(ctx.message.guild.id, 0))
+        self.bot.database.commit()
+        dbcur.close()
 
         await ctx.send(f':white_check_mark: I\'ve started a {self.lilac} pool! '+\
                         f'Members of this guild can put some {self.lilac} in the pool by doing '+\
@@ -63,34 +70,40 @@ class Economy:
         do `pool check` """
         user = ctx.message.author
         guild = ctx.message.guild
-        if guild.id not in self.bot.economy['pools']:
+
+        dbcur = self.bot.database.cursor()
+        dbcur.execute(f'SELECT * FROM pools WHERE guild_id={guild.id}')
+        if len(dbcur.fetchall()) == 0:
             await ctx.send(':x: This guild is not currently hosting a pool event!')
-            return
-        if self.bot.economy['pools'][guild.id] is None:
-            await ctx.send(':x: This guild is not currently hosting a pool event!')
+            dbcur.close()
             return
 
         if args[0] == 'check':
-            in_pool = self.bot.economy['pools'][guild.id]
+            dbcur.execute(f'SELECT * FROM pools WHERE guild_id={guild.id}')
+            in_pool = dbcur.fetchall()[0][1]
             await ctx.send(f'This guild currently has {self.lilac}**{in_pool}** in its pool.')
-            return
+            dbcur.close()
         else:
             amt = None
             try:
                 amt = int(args[0])
             except ValueError:
                 raise commands.errors.BadArgument()
-        
-            if amt > self.bot.economy[user.id]['balance']:
+
+            dbcur.execute(f'SELECT * FROM economy WHERE id={user.id}')
+            user_bal = dbcur.fetchall()[0][1]
+            if amt > user_bal:
                 await ctx.send(f':warning: You don\'t have enough {self.lilac} to make that pool contribution!')
                 return
             if amt < 0:
                 await ctx.send(f':warning: You can\'t put a negative number of {self.lilac} into the pool!')
                 return
 
-            self.bot.economy[user.id]['balance'] -= amt
-            self.bot.economy['pools'][guild.id] += amt
-            self.update_file()
+            dbcur.execute(f'UPDATE economy SET balance=balance-{amt} WHERE id={user.id}')
+            dbcur.exectue(f'UPDATE pools SET pool=pool+{amt} WHERE id={guild.id}')
+
+            dbcur.close()
+            self.bot.database.commit()
 
             await ctx.send(f':white_check_mark: I\'ve put {self.lilac}**{amt}** from your'+\
                             ' account into the pool!')
@@ -100,25 +113,26 @@ class Economy:
     async def poolout(self, ctx):
         """Picks a random member and sends them the content of the pool! Need ManageGuild perm to run cmd."""
         guild = ctx.message.guild
-        if guild.id not in self.bot.economy['pools']:
+
+        dbcur = self.bot.database.cursor()
+        dbcur.execute(f'SELECT * FROM pools WHERE guild_id={guild.id}')
+        if len(dbcur.fetchall()) == 0:
             await ctx.send(':x: This guild is not currently hosting a pool event!')
-            return
-        if self.bot.economy['pools'][guild.id] is None:
-            await ctx.send(':x: This guild is not currently hosting a pool event!')
+            dbcur.close()
             return
 
+        dbcur.execute(f'SELECT * FROM pools WHERE guild_id={guild.id}')
         winner = random.choice([m for m in guild.members if not m.bot])
-        pool_total = self.bot.economy['pools'][guild.id]
+        pool_total = dbcur.fetchall()[0][1]
 
         await ctx.send(f'**{str(winner)}** has won the pool! {self.lilac}**{pool_total}** goes to them!')
 
-        if winner.id not in self.bot.economy:
-            self.create_bank_account(winner)
+        self.check_bank_account(winner)
 
-        self.bot.economy[winner.id]['balance'] += pool_total
-        self.bot.economy['pools'][guild.id] = None
-        self.update_file()
-
+        dbcur.execute(f'UPDATE economy SET balance=balance+{pool_total} WHERE id={winner.id}')
+        dbcur.execute(f'DELETE FROM pools WHERE guild_id={guild.id}')
+        self.bot.database.commit()
+        dbcur.close()
 
     @commands.command(aliases=['bal'])
     async def balance(self, ctx):
