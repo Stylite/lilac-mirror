@@ -99,7 +99,7 @@ class Economy:
                 return
 
             dbcur.execute(f'UPDATE economy SET balance=balance-{amt} WHERE id={user.id}')
-            dbcur.execute(f'UPDATE pools SET pool=pool+{amt} WHERE id={guild.id}')
+            dbcur.execute(f'UPDATE pools SET pool=pool+{amt} WHERE guild_id={guild.id}')
 
             dbcur.close()
             self.bot.database.commit()
