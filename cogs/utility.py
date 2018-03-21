@@ -20,11 +20,11 @@ class Utility:
 
         wind_dir = ['north', 'east', 'south', 'west', 'north'][round(float(location.wind()["direction"])/90)]
         
-        to_send = f'__Weather in **{location.location().city()}, {location.location().country()}**:__\n'+\
-                  f'**Condition:** {location.condition().text()}\n'+\
-                  f'**Temperature:** {location.condition().temp()}°C\n'+\
-                  f'**Humidity:** {location.atmosphere()["humidity"]}%\n'+\
-                  f'**Wind:** Blowing {wind_dir}; {0.277 * float(location.wind()["speed"])} m/s'
+        to_send = f'__**Weather in `{location.location().city()}, {location.location().country()}`**:__\n'+\
+                  f':white_small_square: | **Condition:** {location.condition().text()}\n'+\
+                  f':thermometer: | **Temperature:** {location.condition().temp()}°C\n'+\
+                  f':droplet: | **Humidity:** {location.atmosphere()["humidity"]}%\n'+\
+                  f':dash: | **Wind:** Blowing {wind_dir}; {round(0.277 * float(location.wind()["speed"]), 1)} m/s'
 
         await ctx.send(to_send)
 
