@@ -18,13 +18,13 @@ class Utility:
             await ctx.send(':x: I couldn\'t find any results for that location!')
             return
 
-        wind_dir = ['north', 'east', 'south', 'west', 'north'][round(location.wind()["direction"]/90)]
+        wind_dir = ['north', 'east', 'south', 'west', 'north'][round(float(location.wind()["direction"])/90)]
         
         to_send = f'__Weather in **{location.location().city()}, {location.location().country()}**:__\n'+\
                   f'**Condition:** {location.condition().text()}\n'+\
                   f'**Temperature:** {location.temp()}°C\n'+\
                   f'**Humidity:** {location.atmosphere()["humidity"]}%\n'+\
-                  f'**Wind:** Blowing {wind_dir}; {0.277 * location.wind()["speed"]} m/s'
+                  f'**Wind:** Blowing {wind_dir}; {0.277 * float(location.wind()["speed"])} m/s'
 
         await ctx.send(to_send)
 
