@@ -22,7 +22,7 @@ class Utility:
         
         to_send = f'__Weather in **{location.location().city()}, {location.location().country()}**:__\n'+\
                   f'**Condition:** {location.condition().text()}\n'+\
-                  f'**Temperature:** {location.temp()}°C\n'+\
+                  f'**Temperature:** {location.condition().temp()}°C\n'+\
                   f'**Humidity:** {location.atmosphere()["humidity"]}%\n'+\
                   f'**Wind:** Blowing {wind_dir}; {0.277 * float(location.wind()["speed"])} m/s'
 
