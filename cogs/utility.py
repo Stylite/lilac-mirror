@@ -9,11 +9,11 @@ class Utility:
     def __init__(self, bot):
         self.bot = bot
         self.translator = googletrans.Translator()
-        self.weather = Weather(unit=Unit.CELSIUS)
+        self.weather_obj = Weather(unit=Unit.CELSIUS)
 
     @commands.command()
     async def weather(self, ctx, *, location: str):
-        location = self.weather.lookup_by_location(location)
+        location = self.weather_obj.lookup_by_location(location)
         if location is None:
             await ctx.send(':x: I couldn\'t find any results for that location!')
             return
