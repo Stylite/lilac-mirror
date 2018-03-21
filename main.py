@@ -25,7 +25,6 @@ class Lilac(commands.AutoShardedBot):
         'data/autoroles.yml',
         'data/selfroles.yml',
         'data/gblacklist.txt',
-        'data/economy.yml',
         'data/prefixes.yml'
     ]
 
