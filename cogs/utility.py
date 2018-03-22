@@ -12,6 +12,21 @@ class Utility:
         self.weather_obj = Weather(unit=Unit.CELSIUS)
 
     @commands.command()
+    async def emote(self, ctx, *, emote: str):
+        emote_id = int(emote.split(':')[2][0:-1])
+        emote_obj = self.bot.get_emoji(emote_id)
+
+        to_send = discord.Embed(title=f'Info on emote {str(emote_obj)}')
+        to_send.add_field(name='Emote Name', value=emote_obj.name)
+        to_send.add_field(name='ID', value=emote_obj.id)
+        to_send.add_field(name='From Guild', value=emote_obj.guild.name)
+        to_send.add_field(name='URL', value=emote_obj.url)
+        to_send.add_field(name='Raw Emote', value=f'`{str(emote_obj)}`')
+        to_send.add_field(name='Created At', value=emote_obj.created_at)
+
+        await ctx.send(embed=to_send)
+
+    @commands.command()
     async def weather(self, ctx, *, location: str):
         location = self.weather_obj.lookup_by_location(location)
         if location is None:
