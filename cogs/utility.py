@@ -26,12 +26,11 @@ class Utility:
             return
 
         to_send = discord.Embed(title=f'Info on emote {str(emote_obj)}', colour=0xbd8cbf)
-        to_send.add_field(name='Emote Name', value=emote_obj.name)
-        to_send.add_field(name='ID', value=emote_obj.id)
-        to_send.add_field(name='From Guild', value=emote_obj.guild.name)
-        to_send.add_field(name='URL', value=f'[Click Here]({emote_obj.url})')
-        to_send.add_field(name='Raw Emote', value=f'`{str(emote_obj)}`')
-        to_send.add_field(name='Created At', value=emote_obj.created_at)
+        to_send.set_thumbnail(url=emote_obj.url)
+        to_send.add_field(name='Emote Name', value=emote_obj.name, inline=True)
+        to_send.add_field(name='ID', value=emote_obj.id, inline=True)
+        to_send.add_field(name='From Guild', value=emote_obj.guild.name, inline=True)
+        to_send.add_field(name='Created At', value=str(emote_obj.created_at).split('.')[0], inline=True)
 
         await ctx.send(embed=to_send)
 
