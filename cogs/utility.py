@@ -13,10 +13,19 @@ class Utility:
 
     @commands.command()
     async def emote(self, ctx, *, emote: str):
-        emote_id = int(emote.split(':')[2][0:-1])
-        emote_obj = self.bot.get_emoji(emote_id)
+        emote_id = None
+        try:
+            emote_id = int(emote.split(':')[2][0:-1])
+        except IndexError:
+            await ctx.send(':warning: That\'s not a custom emote!')
+            return
 
-        to_send = discord.Embed(title=f'Info on emote {str(emote_obj)}')
+        emote_obj = self.bot.get_emoji(emote_id)
+        if emote_obj is None:
+            await ctx.send(':warning: I couldn\'t get any information on that emote!')
+            return
+
+        to_send = discord.Embed(title=f'Info on emote {str(emote_obj)}', colour=0xbd8cbf)
         to_send.add_field(name='Emote Name', value=emote_obj.name)
         to_send.add_field(name='ID', value=emote_obj.id)
         to_send.add_field(name='From Guild', value=emote_obj.guild.name)
