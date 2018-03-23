@@ -35,7 +35,7 @@ class Mod:
             for role in guild.roles:
                 if role.name == 'lilac-mute':
                     mute_role = role
-            if role in to_mute.roles:
+            if mute_role in to_mute.roles:
                 await ctx.send(f':warning: `{str(to_mute)}` is already muted!')
                 return
 
