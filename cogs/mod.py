@@ -13,6 +13,16 @@ class Mod:
     def __init__(self, bot):
         self.bot = bot
 
+        dbcur = self.bot.database.cursor()
+        dbcur.execute('''
+            CREATE TABLE IF NOT EXISTS 
+            autoroles(guild_id INTEGER, role_ids TEXT)''')
+        dbcur.execute('''
+            CREATE TABLE IF NOT EXISTS 
+            selfroles(guild_id INTEGER, role_ids TEXT)''')
+        self.bot.database.commit()
+        dbcur.close()
+
     @commands.command()
     @manage_usrs()
     async def mute(self, ctx, mention: str):
@@ -150,6 +160,8 @@ class Mod:
         To create an autorole, do `,autorole add <role-name>`.
         To remove an autorole, do `,autorole remove <role-name>`"""
 
+        dbcur = self.bot.database.cursor()
+
         if action.lower() == 'add':
             to_add = None
             for role in ctx.message.guild.roles:
@@ -160,11 +172,14 @@ class Mod:
                 await ctx.send(f':warning: Role `{role_name}` not found.')
                 return
 
-            if ctx.message.guild.id in self.bot.autoroles:
-                self.bot.autoroles[ctx.message.guild.id].append(to_add.id)
+            dbcur.execute(f'SELECT * FROM autoroles WHERE guild_id={ctx.message.guild.id}')
+            if len(dbcur.fetchall()) > 0:
+                dbcur.execute(f"""UPDATE autoroles SET role_ids=role_ids||' {to_add.id}' 
+                              WHERE guild_id={ctx.message.guild.id}""")
             else:
-                self.bot.autoroles[ctx.message.guild.id] = [to_add.id]
-            yaml.dump(self.bot.autoroles, open('data/autoroles.yml', 'w'))
+                dbcur.execute('INSERT INTO autoroles(guild_id,role_ids) (?,?)',
+                             (ctx.message.guild.id, str(to_add.id)))
+                
             await ctx.send(f':white_check_mark: Role `{to_add.name}` added to autoroles.')
 
         elif action.lower() == 'remove':
@@ -177,10 +192,14 @@ class Mod:
                 await ctx.send(f':warning: Role `{role_name}` not found.')
                 return
 
-            if ctx.message.guild.id in self.bot.autoroles:
-                if to_remove.id in self.bot.autoroles[ctx.message.guild.id]:
-                    self.bot.autoroles[ctx.message.guild.id].remove(
-                        to_remove.id)
+            dbcur.execute(f'SELECT * FROM autoroles WHERE guild_id={ctx.message.guild.id}')
+            if len(dbcur.fetchall()) > 0:
+                dbcur.execute(f'SELECT role_ids FROM autoroles WHERE guild_id={ctx.message.guild.id}')
+                autorole_ids = [int(role_id) for role_id dbcur.fetchall()[0].split()]
+                if to_remove.id in autorole_ids:
+                    new_rid_str = ' '.join([str(r_id) for r_id in autorole_ids.remove(to_remove.id)])
+                    dbcur.execute(f'''UPDATE autoroles SET role_ids={new_rid_str} 
+                                  WHERE guild_id={ctx.message.guild.id}''')
                 else:
                     await ctx.send(':warning: That role is not an autorole.')
                     return
@@ -189,10 +208,12 @@ class Mod:
                 return
 
             await ctx.send(f':white_check_mark: Removed role `{to_remove.name}` from autoroles.')
-            yaml.dump(self.bot.autoroles, open('data/autoroles.yml', 'w'))
 
         else:
             await ctx.send(':warning: Invalid action. The valid actions are `add` and `remove`.')
+
+        self.bot.database.commit()
+        dbcur.close()
 
     @commands.command()
     @manage_roles()
