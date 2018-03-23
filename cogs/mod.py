@@ -195,7 +195,7 @@ class Mod:
             dbcur.execute(f'SELECT * FROM autoroles WHERE guild_id={ctx.message.guild.id}')
             if len(dbcur.fetchall()) > 0:
                 dbcur.execute(f'SELECT role_ids FROM autoroles WHERE guild_id={ctx.message.guild.id}')
-                autorole_ids = [int(role_id) for role_id dbcur.fetchall()[0].split()]
+                autorole_ids = [int(role_id) for role_id in dbcur.fetchall()[0].split()]
                 if to_remove.id in autorole_ids:
                     new_rid_str = ' '.join([str(r_id) for r_id in autorole_ids.remove(to_remove.id)])
                     dbcur.execute(f'''UPDATE autoroles SET role_ids={new_rid_str} 
