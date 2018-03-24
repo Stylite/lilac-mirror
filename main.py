@@ -87,8 +87,6 @@ class Lilac(commands.AutoShardedBot):
             self.welcomes = yaml.load(welcomes)
         with open('data/goodbyes.yml', 'r') as goodbyes:
             self.goodbyes = yaml.load(goodbyes)
-        with open('data/autoroles.yml', 'r') as autoroles:
-            self.autoroles = yaml.load(autoroles)
         with open('data/selfroles.yml', 'r') as selfroles:
             self.selfroles = yaml.load(selfroles)
         with open('data/prefixes.yml', 'r') as prefixes:
@@ -157,7 +155,7 @@ class Lilac(commands.AutoShardedBot):
             await welcome_channel.send(fmt_welcome_message)
         # handle autoroles
         dbcur = self.database.cursor()
-        dbcur.execute(f'SELECT role_id FROM autoroles WHERE guild_id={ctx.message.guild.id}')
+        dbcur.execute(f'SELECT role_id FROM autoroles WHERE guild_id={member.guild.id}')
         autoroles = [x[0] for x in dbcur.fetchall()]
         for role in autoroles:
             to_add = list(filter(lambda x: x.id == role, member.guild.roles()))[0]
