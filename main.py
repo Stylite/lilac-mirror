@@ -157,17 +157,13 @@ class Lilac(commands.AutoShardedBot):
                 '%mention%', member.mention)
             await welcome_channel.send(fmt_welcome_message)
         # handle autoroles
-        if member.guild.id in self.autoroles:
-            autoroles = self.autoroles[member.guild.id]
-            for role_id in autoroles:
-                to_add = None
-                for role in member.guild.roles:
-                    if role.id == role_id:
-                        to_add = role
-                        break
-
-                if to_add:
-                    await member.add_roles(to_add)
+        dbcur = self.database.cursor()
+        dbcur.execute(f'SELECT role_id FROM autoroles WHERE guild_id={ctx.message.guild.id}')
+        autoroles = dbcur.fetchall()
+        for role in autoroles:
+            to_add = list(filter(lambda x: x.id == role, member.guild.roles()))[0]
+            await member.add_roles(to_add)
+        dbcur.close()
 
     async def on_member_remove(self, member):
         """on_member_remove event; handle leave messages"""
