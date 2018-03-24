@@ -173,6 +173,12 @@ class Mod:
                 dbcur.close()
                 return
 
+            dbcur.execute(f'SELECT role_id FROM autoroles WHERE guild_id={ctx.message.guild.id}')
+            if to_add.id in [x[0] for x in dbcur.fetchall()]:
+                await ctx.send(':warning: That role is already an autorole!')
+                dbcur.close()
+                return
+
             dbcur.execute('INSERT INTO autoroles(guild_id,role_id) VALUES (?,?)',
                             (ctx.message.guild.id, to_add.id))
                 
@@ -193,7 +199,7 @@ class Mod:
             if len(dbcur.fetchall()) > 0:
                 dbcur.execute(f'SELECT role_id FROM autoroles WHERE guild_id={ctx.message.guild.id}')
 
-                autorole_ids = dbcur.fetchall()
+                autorole_ids = [x[0] for x in dbcur.fetchall()]
                 if to_remove.id in autorole_ids:
                     dbcur.execute(f'DELETE FROM autoroles WHERE role_id={to_remove.id}')
                 else:
@@ -226,7 +232,7 @@ class Mod:
             return
 
         dbcur.execute(f'SELECT role_id FROM autoroles WHERE guild_id={ctx.message.guild.id}')
-        autorole_ids = dbcur.fetchall()
+        autorole_ids = [x[0] for x in dbcur.fetchall()]
         autorole_names = []
 
         for r_id in autorole_ids:
