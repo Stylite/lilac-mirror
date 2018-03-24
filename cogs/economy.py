@@ -40,16 +40,32 @@ class Economy:
             self.create_bank_account(member)
         dbcur.close()
 
-    @commands.command()
-    @manage_guild()
-    async def startpool(self, ctx):
-        """Starts a pool of <:lilac:419730009234866176> for a guild. Need ManageGuild perms to run cmd.
+    @commands.group()
+    async def pool(self, ctx):
+        """Guild pool commands! `h pool` for more details.
 
-        Once the pool is created, users should be notified that a pool
-        has started, and be encouraged to donate to the pool, by doing
-        `pool <some-amt>`. When the `poolout` command is executed, by an
-        Admin, the pool's contents will be given to random member of the
-        current guild."""
+        When a pool is created, everyone in the guild
+        can put <:lilac:419730009234866176> into the pool. After the pool has 
+        reached an appropriate size, `pool out` can 
+        be run by a person with ManageGuild, and all of the
+        pool's contents will be given to a random user in the guild.
+        
+        To start a pool, do `pool start`. [Requires ManageGuild]
+        To put <:lilac:419730009234866176> into the pool, do `pool add <amt>`.
+        To check the pool's size, do `pool check`.
+        To put the pool out, do `,pool out` [Requires ManageGuild]"""
+        if ctx.invoked_subcommand is None:
+            await ctx.send(
+                "To start a pool, do `pool start`. [Requires ManageGuild]\n"+\
+                "To put <:lilac:419730009234866176> into the pool, do `pool add <amt>`.\n"+\
+                "To check the pool's size, do `pool check`.\n"+\
+                "To put the pool out, do `,pool out` [Requires ManageGuild]\n\n"+\
+                "Do `,h pool` for more details."
+            )
+
+    @pool.command(name='start')
+    @manage_guild()
+    async def _start(self, ctx):
         dbcur = self.bot.database.cursor()
         dbcur.execute('INSERT INTO pools(guild_id,pool) VALUES (?,?)',(ctx.message.guild.id, 0))
         self.bot.database.commit()
@@ -57,16 +73,12 @@ class Economy:
 
         await ctx.send(f':white_check_mark: I\'ve started a {self.lilac} pool! '+\
                         f'Members of this guild can put some {self.lilac} in the pool by doing '+\
-                        f'`pool [some-amount]`. When you feel the pool has reached a high enough size, '+\
-                        f'run `poolout` and all of the {self.lilac} in the pool will be given to a random '+\
+                        f'`pool add <some-amt>`. When you feel the pool has reached a high enough size, '+\
+                        f'run `pool out` and all of the {self.lilac} in the pool will be given to a random '+\
                         f'member in this guild!')
 
-    @commands.command()
-    async def pool(self, ctx, *args):
-        """Pools in <:lilac:419730009234866176> to the guild pool!
-        
-        To check how many<:lilac:419730009234866176> are currently in the pool,
-        do `pool check` """
+    @pool.command(name='add')
+    async def _add(self, ctx, *, amt: int):
         user = ctx.message.author
         guild = ctx.message.guild
 
@@ -77,40 +89,38 @@ class Economy:
             dbcur.close()
             return
 
-        if args[0] == 'check':
-            dbcur.execute(f'SELECT * FROM pools WHERE guild_id={guild.id}')
-            in_pool = dbcur.fetchall()[0][1]
-            await ctx.send(f'This guild currently has {self.lilac}**{in_pool}** in its pool.')
-            dbcur.close()
-        else:
-            amt = None
-            try:
-                amt = int(args[0])
-            except ValueError:
-                raise commands.errors.BadArgument()
+        dbcur.execute(f'SELECT * FROM economy WHERE id={user.id}')
+        user_bal = dbcur.fetchall()[0][1]
+        if amt > user_bal:
+            await ctx.send(f':warning: You don\'t have enough {self.lilac} to make that pool contribution!')
+            return
+        if amt < 0:
+            await ctx.send(f':warning: You can\'t put a negative number of {self.lilac} into the pool!')
+            return
 
-            dbcur.execute(f'SELECT * FROM economy WHERE id={user.id}')
-            user_bal = dbcur.fetchall()[0][1]
-            if amt > user_bal:
-                await ctx.send(f':warning: You don\'t have enough {self.lilac} to make that pool contribution!')
-                return
-            if amt < 0:
-                await ctx.send(f':warning: You can\'t put a negative number of {self.lilac} into the pool!')
-                return
+        dbcur.execute(f'UPDATE economy SET balance=balance-{amt} WHERE id={user.id}')
+        dbcur.execute(f'UPDATE pools SET pool=pool+{amt} WHERE guild_id={guild.id}')
 
-            dbcur.execute(f'UPDATE economy SET balance=balance-{amt} WHERE id={user.id}')
-            dbcur.execute(f'UPDATE pools SET pool=pool+{amt} WHERE guild_id={guild.id}')
+        dbcur.close()
+        self.bot.database.commit()
 
-            dbcur.close()
-            self.bot.database.commit()
+        await ctx.send(f':white_check_mark: I\'ve put {self.lilac}**{amt}** from your'+\
+                        ' account into the pool!')
 
-            await ctx.send(f':white_check_mark: I\'ve put {self.lilac}**{amt}** from your'+\
-                            ' account into the pool!')
+    @pool.command(name='check')
+    async def _check(self, ctx):
+        guild = ctx.message.guild
+        dbcur = self.bot.database.cursor()
+
+        dbcur.execute(f'SELECT * FROM pools WHERE guild_id={guild.id}')
+        in_pool = dbcur.fetchall()[0][1]
+
+        await ctx.send(f'This guild currently has {self.lilac}**{in_pool}** in its pool.')
+        dbcur.close()
             
-    @commands.command()
+    @pool.command(name='out')
     @manage_guild()
-    async def poolout(self, ctx):
-        """Picks a random member and sends them the content of the pool! Need ManageGuild perm to run cmd."""
+    async def _out(self, ctx):
         guild = ctx.message.guild
 
         dbcur = self.bot.database.cursor()
