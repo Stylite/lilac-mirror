@@ -156,20 +156,20 @@ class Mod:
     async def autorole(self, ctx):
         """Manages autoroles.
 
-        To create an autorole, do `autorole add <role-name>`.
-        To remove an autorole, do `autorole remove <role-name>`
+        To create an autorole, do `autorole add <role-name>`. [Requires ManageRoles]
+        To remove an autorole, do `autorole remove <role-name>`. [Requires ManageRoles]
         To list autoroles, do `autorole list`."""
         if ctx.invoked_subcommand is None:
             await ctx.send(
-                "To create an autorole, do `autorole add <role-name>`.\n"+\
-                "To remove an autorole, do `autorole remove <role-name>`\n"+\
+                "To create an autorole, do `autorole add <role-name>`. [Requires ManageRoles]\n"+\
+                "To remove an autorole, do `autorole remove <role-name>`. [Requires ManageRoles]\n"+\
                 "To list autoroles, do `autorole list`.\n"
             )
             return
 
     @autorole.command(name='add')
     @manage_roles()
-    async def _add(self, ctx, *, role_name: str):
+    async def _aradd(self, ctx, *, role_name: str):
         dbcur = self.bot.database.cursor()
 
         to_add = None
@@ -198,7 +198,7 @@ class Mod:
 
     @autorole.command(name='remove')
     @manage_roles()
-    async def _remove(self, ctx, *, role_name: str):
+    async def _arremove(self, ctx, *, role_name: str):
         dbcur = self.bot.database.cursor()
 
         to_remove = None
@@ -230,7 +230,7 @@ class Mod:
         await ctx.send(f':white_check_mark: Removed role `{to_remove.name}` from autoroles.')
         
     @autorole.command(name='list')
-    async def _list(self, ctx):
+    async def _arlist(self, ctx):
         dbcur = self.bot.database.cursor()
 
         dbcur.execute(f'SELECT * FROM autoroles WHERE guild_id={ctx.message.guild.id}')
@@ -300,62 +300,83 @@ class Mod:
         await ctx.send(':white_check_mark: Set your goodbye channel to `{}`.'
                        .format(ctx.message.channel_mentions[0]))
 
-    @commands.command()
+    @commands.group()
     @manage_roles()
-    async def selfrole(self, ctx, action: str, *, role_name: str):
-        """Creates/removes selfroles (self-assignable roles).
+    async def selfrole(self, ctx):
+        """Manages selfroles.
 
-        To create a selfrole, do `,selfrole add <role_name>`.
-        To remove a selfrole, do `,selfrole remove <role_name>`"""
-        if action.lower() == 'add':
-            role = None
-            for r in ctx.message.guild.roles:
-                if r.name.lower() == role_name.lower():
-                    role = r
-                    break
-            else:
-                await ctx.send(f':warning: Role `{role_name}` was not found.')
-                return
+        To create a selfrole, do `,selfrole add <role_name>`. [Requires ManageRoles] 
+        To remove a selfrole, do `,selfrole remove <role_name>`. [Requires ManageRoles]
+        To list selfroles, do `,selfrole list`."""
+        if ctx.invoked_subcommand is None:
+            await ctx.send(
+                "To create a selfrole, do `,selfrole add <role_name>`. [Requires ManageRoles]\n"+\
+                "To remove a selfrole, do `,selfrole remove <role_name>`. [Requires ManageRoles]\n"+\
+                "To list selfroles, do `,selfrole list`."
+            )
+            return
+        
+    @selfrole.command(name='add')
+    @manage_roles()
+    async def _sradd(self, ctx, *, role_name: str):
+        dbcur = self.bot.database.cursor()
 
-            if ctx.message.guild.id in self.bot.selfroles:
-                self.bot.selfroles[ctx.message.guild.id].append(role.id)
-            else:
-                self.bot.selfroles[ctx.message.guild.id] = [role.id]
-
-            yaml.dump(self.bot.selfroles, open('data/selfroles.yml', 'w'))
-            await ctx.send(f':white_check_mark: I have added `{role_name}` to selfroles!')
-
-        elif action.lower() == 'remove':
-            role = None
-            for r in ctx.message.guild.roles:
-                if r.name.lower() == role_name.lower():
-                    role = r
-                    break
-            else:
-                await ctx.send(f':warning: Role `{role_name}` was not found.')
-                return
-
-            if ctx.message.guild.id not in self.bot.selfroles:
-                await ctx.send(f':warning: Your guild does not have any selfroles. ' +
-                               'Thus, I cannot remove a role from the nonexistent selfroles list.')
-                return
-
-            self.bot.selfroles[ctx.message.guild.id].remove(role.id)
-            yaml.dump(self.bot.selfroles, open('data/autoroles.yml', 'w'))
-
-            await ctx.send(f':white_check_mark: Role `{role_name}` was removed from the selfroles!')
-
+        role = None
+        for r in ctx.message.guild.roles:
+            if r.name.lower() == role_name.lower():
+                role = r
+                break
         else:
-            await ctx.send(f':warning: That\'s not a valid argument.')
-
-    @commands.command()
-    async def selfroles(self, ctx):
-        """Lists all the selfroles for a guild."""
-        if ctx.message.guild.id not in self.bot.selfroles:
-            await ctx.send('This guild does not have any selfroles.')
+            await ctx.send(f':warning: Role `{role_name}` was not found.')
             return
 
-        selfrole_ids = self.bot.selfroles[ctx.message.guild.id]
+        dbcur.execute('INSERT INTO selfroles(guild_id, role_id) VALUES (?,?)',
+                     (ctx.message.guild.id, role.id))
+
+        self.bot.database.commit()
+        dbcur.close()
+
+        await ctx.send(f':white_check_mark: I have added `{role_name}` to selfroles!')
+
+    @selfrole.command(name='remove')
+    @manage_roles()
+    async def _srremove(self, ctx, *, role_name: str):
+        dbcur = self.bot.database.cursor()
+
+        role = None
+        for r in ctx.message.guild.roles:
+            if r.name.lower() == role_name.lower():
+                role = r
+                break
+        else:
+            await ctx.send(f':warning: Role `{role_name}` was not found.')
+            return
+
+        dbcur.execute(f'SELECT * FROM selfroles WHERE guild_id={ctx.message.guild.id}')
+        if len(dbcur.fetchall()) == 0:
+            await ctx.send(f':warning: Your guild does not have any selfroles. ' +
+                            'Thus, I cannot remove a role from the nonexistent selfroles list.')
+            return
+
+        dbcur.execute(f'DELETE FROM selfroles WHERE role_id={role.id}')
+        
+        self.bot.database.commit()
+        dbcur.close()
+
+        await ctx.send(f':white_check_mark: Role `{role_name}` was removed from the selfroles!')
+
+    @selfrole.command(name='list')
+    async def _srlist(self, ctx):
+        """Lists all the selfroles for a guild."""
+        dbcur = self.bot.database.cursor()
+        
+        dbcur.execute(f'SELECT * FROM selfroles WHERE guild_id={ctx.message.guild.id}')
+        if len(dbcur.fetchall()) == 0:
+            await ctx.send(':warning: This guild does not have any selfroles.')
+            return
+
+        dbcur.execute(f'SELECT role_id FROM selfroles WHERE guild_id={ctx.message.guild.id}')
+        selfrole_ids = [x[0] for x in dbcur.fetchall()]
         selfrole_names = []
 
         for r_id in selfrole_ids:
@@ -364,11 +385,10 @@ class Mod:
                     selfrole_names.append(r.name)
                     break
             else:
-                self.bot.selfroles[ctx.message.guild.id].remove(r_id)
-                yaml.dump(self.bot.selfroles, open('data/selfroles.yml', 'w'))
+                dbcur.execute(f'DELETE FROM selfroles WHERE role_id={r_id}')
 
         if len(selfrole_names) == 0:
-            await ctx.send('This guild does not have any selfroles.')
+            await ctx.send(':warning: This guild does not have any selfroles.')
             return
 
         msg = 'This server\'s selfroles are: ```'
@@ -376,11 +396,16 @@ class Mod:
             msg += f'• {role}\n'
         msg += '```'
 
+        self.bot.database.commit()
+        dbcur.close()
+
         await ctx.send(msg)
 
     @commands.command()
     async def getrole(self, ctx, *, role_name: str):
         """Gets a selfrole."""
+        dbcur = self.bot.database.cursor()
+
         role = None
         for r in ctx.message.guild.roles:
             if r.name.lower() == role_name.lower():
@@ -394,14 +419,18 @@ class Mod:
             await ctx.send(':warning: You already have that role.')
             return
 
-        if ctx.message.guild.id not in self.bot.selfroles:
+        dbcur.execute(f'SELECT * FROM selfroles WHERE guild_id={ctx.message.guild.id}')
+        if len(dbcur.fetchall()) == 0:
             await ctx.send(':warning: That role isn\'t a selfrole -- in fact, this guild ' +
                            'doesn\'t even have any selfroles.')
             return
 
-        if role.id not in self.bot.selfroles[ctx.message.guild.id]:
+        dbcur.execute(f'SELECT role_id FROM selfroles WHERE guild_id={ctx.message.guild.id}')
+        if role.id not in [x[0] for x in dbcur.fetchall()]:
             await ctx.send(':warning: That role isn\'t a selfrole.')
             return
+
+        dbcur.close()
 
         await ctx.message.author.add_roles(role)
         await ctx.send(f':white_check_mark: **{ctx.message.author.name}**, you now have `{role.name}` role.')
@@ -409,6 +438,8 @@ class Mod:
     @commands.command(aliases=['loserole'])
     async def droprole(self, ctx, *, role_name: str):
         """Removes a selfrole."""
+        dbcur = self.bot.database.cursor()
+
         role = None
         for r in ctx.message.guild.roles:
             if r.name.lower() == role_name.lower():
@@ -422,14 +453,18 @@ class Mod:
             await ctx.send(':warning: You do not have that role.')
             return
 
-        if ctx.message.guild.id not in self.bot.selfroles:
+        dbcur.execute(f'SELECT * FROM selfroles WHERE guild_id={ctx.message.guild.id}')
+        if len(dbcur.fetchall()) == -0:
             await ctx.send(':warning: That role isn\'t a selfrole -- in fact, this guild ' +
                            'doesn\'t even have any selfroles.')
             return
 
-        if role.id not in self.bot.selfroles[ctx.message.guild.id]:
+        dbcur.execute(f'SELECT role_id FROM selfroles WHERE guild_id={ctx.message.guild.id}')
+        if role.id not in [x[0] for x in dbcur.fetchall()]:
             await ctx.send(':warning: That role isn\'t a selfrole.')
             return
+
+        dbcur.close()
 
         await ctx.message.author.remove_roles(role)
         await ctx.send(f':white_check_mark: **{ctx.message.author.name}**, you no longer have `{role.name}` role.')
