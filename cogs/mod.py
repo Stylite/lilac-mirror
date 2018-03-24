@@ -152,77 +152,85 @@ class Mod:
         await ctx.send(':white_check_mark: Set your welcome channel to `{}`.'
                        .format(ctx.message.channel_mentions[0]))
 
-    @commands.command()
+    @commands.group()
+    async def autorole(self, ctx):
+        """Manages autoroles.
+
+        To create an autorole, do `autorole add <role-name>`.
+        To remove an autorole, do `autorole remove <role-name>`
+        To list autoroles, do `autorole list`."""
+        if ctx.invoked_subcommand is None:
+            await ctx.send(
+                "To create an autorole, do `autorole add <role-name>`.\n"+\
+                "To remove an autorole, do `autorole remove <role-name>`\n"+\
+                "To list autoroles, do `autorole list`.\n"
+            )
+            return
+
+    @autorole.command(name='add')
     @manage_roles()
-    async def autorole(self, ctx, action: str, *, role_name: str):
-        """Creates/removes autoroles.
-
-        To create an autorole, do `,autorole add <role-name>`.
-        To remove an autorole, do `,autorole remove <role-name>`"""
-
+    async def _add(self, ctx, *, role_name: str):
         dbcur = self.bot.database.cursor()
 
-        if action.lower() == 'add':
-            to_add = None
-            for role in ctx.message.guild.roles:
-                if role_name.lower() == role.name.lower():
-                    to_add = role
-                    break
-            else:
-                await ctx.send(f':warning: Role `{role_name}` not found.')
-                dbcur.close()
-                return
-
-            dbcur.execute(f'SELECT role_id FROM autoroles WHERE guild_id={ctx.message.guild.id}')
-            if to_add.id in [x[0] for x in dbcur.fetchall()]:
-                await ctx.send(':warning: That role is already an autorole!')
-                dbcur.close()
-                return
-
-            dbcur.execute('INSERT INTO autoroles(guild_id,role_id) VALUES (?,?)',
-                            (ctx.message.guild.id, to_add.id))
-                
-            await ctx.send(f':white_check_mark: Role `{to_add.name}` added to autoroles.')
-
-        elif action.lower() == 'remove':
-            to_remove = None
-            for role in ctx.message.guild.roles:
-                if role_name.lower() == role.name.lower():
-                    to_remove = role
-                    break
-            else:
-                await ctx.send(f':warning: Role `{role_name}` not found.')
-                dbcur.close()
-                return
-
-            dbcur.execute(f'SELECT * FROM autoroles WHERE guild_id={ctx.message.guild.id}')
-            if len(dbcur.fetchall()) > 0:
-                dbcur.execute(f'SELECT role_id FROM autoroles WHERE guild_id={ctx.message.guild.id}')
-
-                autorole_ids = [x[0] for x in dbcur.fetchall()]
-                if to_remove.id in autorole_ids:
-                    dbcur.execute(f'DELETE FROM autoroles WHERE role_id={to_remove.id}')
-                else:
-                    await ctx.send(':warning: That role is not an autorole.')
-                    dbcur.close()
-                    return
-            else:
-                await ctx.send(':warning: You currently do not have any autoroles.')
-                dbcur.close()
-                return
-
-            await ctx.send(f':white_check_mark: Removed role `{to_remove.name}` from autoroles.')
-
+        to_add = None
+        for role in ctx.message.guild.roles:
+            if role_name.lower() == role.name.lower():
+                to_add = role
+                break
         else:
-            await ctx.send(':warning: Invalid action. The valid actions are `add` and `remove`.')
+            await ctx.send(f':warning: Role `{role_name}` not found.')
+            dbcur.close()
+            return
+
+        dbcur.execute(f'SELECT role_id FROM autoroles WHERE guild_id={ctx.message.guild.id}')
+        if to_add.id in [x[0] for x in dbcur.fetchall()]:
+            await ctx.send(':warning: That role is already an autorole!')
+            dbcur.close()
+            return
+
+        dbcur.execute('INSERT INTO autoroles(guild_id,role_id) VALUES (?,?)',
+                        (ctx.message.guild.id, to_add.id))
 
         self.bot.database.commit()
         dbcur.close()
+            
+        await ctx.send(f':white_check_mark: Role `{to_add.name}` added to autoroles.')
 
-    @commands.command()
+    @autorole.command(name='remove')
     @manage_roles()
-    async def autoroles(self, ctx):
-        """Lists current autoroles."""
+    async def _remove(self, ctx, *, role_name: str):
+        dbcur = self.bot.database.cursor()
+
+        to_remove = None
+        for role in ctx.message.guild.roles:
+            if role_name.lower() == role.name.lower():
+                to_remove = role
+                break
+        else:
+            await ctx.send(f':warning: Role `{role_name}` not found.')
+            dbcur.close()
+            return
+
+        dbcur.execute(f'SELECT * FROM autoroles WHERE guild_id={ctx.message.guild.id}')
+        if len(dbcur.fetchall()) > 0:
+            dbcur.execute(f'SELECT role_id FROM autoroles WHERE guild_id={ctx.message.guild.id}')
+
+            autorole_ids = [x[0] for x in dbcur.fetchall()]
+            if to_remove.id in autorole_ids:
+                dbcur.execute(f'DELETE FROM autoroles WHERE role_id={to_remove.id}')
+            else:
+                await ctx.send(':warning: That role is not an autorole.')
+                dbcur.close()
+                return
+        else:
+            await ctx.send(':warning: You currently do not have any autoroles.')
+            dbcur.close()
+            return
+
+        await ctx.send(f':white_check_mark: Removed role `{to_remove.name}` from autoroles.')
+        
+    @autorole.command(name='list')
+    async def _list(self, ctx):
         dbcur = self.bot.database.cursor()
 
         dbcur.execute(f'SELECT * FROM autoroles WHERE guild_id={ctx.message.guild.id}')
