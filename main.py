@@ -158,7 +158,7 @@ class Lilac(commands.AutoShardedBot):
         dbcur.execute(f'SELECT role_id FROM autoroles WHERE guild_id={member.guild.id}')
         autoroles = [x[0] for x in dbcur.fetchall()]
         for role in autoroles:
-            to_add = list(filter(lambda x: x.id == role, member.guild.roles()))[0]
+            to_add = [x for x in member.guild.roles if x.id == role][0]
             await member.add_roles(to_add)
         dbcur.close()
 
