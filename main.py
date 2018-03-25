@@ -20,9 +20,6 @@ class Lilac(commands.AutoShardedBot):
     DATAFILES = [
         'data/database.db',
         'data/info.yml',
-        'data/welcomes.yml',
-        'data/goodbyes.yml',
-        'data/selfroles.yml',
         'data/gblacklist.txt',
         'data/prefixes.yml'
     ]
@@ -72,23 +69,15 @@ class Lilac(commands.AutoShardedBot):
 
         self.config = {}
         self.info = {}
-        self.welcomes, self.goodbyes = {}, {}
-        self.autoroles, self.selfroles = {}, {}
-        self.blacklist = list(map(int, [s.strip() for s in open('data/gblacklist.txt')
-                                        .readlines()]))
+        self.blacklist = list(map(int, [s.strip() for s in open('data/gblacklist.txt').readlines()]))
         self.prefixes = {}
+    
         self.database = sqlite.connect('data/database.db')
 
-        with open('data/info.yml', 'r') as info:
-            self.info = yaml.load(info) 
         with open('config.yml', 'r') as config:
             self.config = yaml.load(config)
-        with open('data/welcomes.yml', 'r') as welcomes:
-            self.welcomes = yaml.load(welcomes)
-        with open('data/goodbyes.yml', 'r') as goodbyes:
-            self.goodbyes = yaml.load(goodbyes)
-        with open('data/selfroles.yml', 'r') as selfroles:
-            self.selfroles = yaml.load(selfroles)
+        with open('data/info.yml', 'r') as info:
+            self.info = yaml.load(info) 
         with open('data/prefixes.yml', 'r') as prefixes:
             self.prefixes = yaml.load(prefixes)
 
@@ -106,7 +95,7 @@ class Lilac(commands.AutoShardedBot):
         await self.change_presence(activity=discord.Game(name=f",help"))
 
     async def on_command_error(self, ctx, exception):
-        """Function executes once bot encounters an error"""
+        """Function executes once bot encounters an error."""
         err = None
         if isinstance(exception, commands.CommandInvokeError):
             err = traceback.format_exception(type(exception.original), exception.original,
@@ -141,41 +130,52 @@ class Lilac(commands.AutoShardedBot):
     async def on_member_join(self, member):
         """on_member_join event; handle welcome messages and autoroles"""
         # handle welcome messages
-        if member.guild.id in self.welcomes:
-            welcome_config = self.welcomes[member.guild.id]
+        dbcur = self.database.cursor()
+
+        dbcur.execute(f'SELECT * FROM welcomes WHERE guild_id={member.guild.id}')
+        if len(dbcur.fetchall()) == 1:
+            dbcur.execute(f'SELECT * FROM welcomes WHERE guild_id={member.guild.id}')
+            welcome_config = dbcur.fetchall()[0]
 
             welcome_channel = None
-            if welcome_config[0] is not None:
-                welcome_channel = member.guild.get_channel(welcome_config[0])
+            if welcome_config[2] != 0:
+                welcome_channel = member.guild.get_channel(welcome_config[2])
             else:
                 return
 
             fmt_welcome_message = welcome_config[1].replace(
                 '%mention%', member.mention)
             await welcome_channel.send(fmt_welcome_message)
+
         # handle autoroles
-        dbcur = self.database.cursor()
         dbcur.execute(f'SELECT role_id FROM autoroles WHERE guild_id={member.guild.id}')
         autoroles = [x[0] for x in dbcur.fetchall()]
         for role in autoroles:
             to_add = [x for x in member.guild.roles if x.id == role][0]
             await member.add_roles(to_add)
+
         dbcur.close()
 
     async def on_member_remove(self, member):
-        """on_member_remove event; handle leave messages"""
-        if member.guild.id in self.goodbyes:
-            goodbye_config = self.goodbyes[member.guild.id]
+        """on_member_remove event; handle goodbye messages"""
+        dbcur = self.database.cursor()
+
+        dbcur.execute(f'SELECT * FROM goodbyes WHERE guild_id={member.guild.id}')
+        if len(dbcur.fetchall()) == 1:
+            dbcur.execute(f'SELECT * FROM goodbyes WHERE guild_id={member.guild.id}')
+            goodbye_config = dbcur.fetchall()[0]
 
             goodbye_channel = None
-            if goodbye_config[0] is not None:
-                goodbye_channel = member.guild.get_channel(goodbye_config[0])
+            if goodbye_config[2] != 0:
+                goodbye_channel = member.guild.get_channel(goodbye_config[2])
             else:
                 return
 
             fmt_goodbye_message = goodbye_config[1].replace(
                 '%name%', member.name)
             await goodbye_channel.send(fmt_goodbye_message)
+            
+        dbcur.close()
 
     async def on_message(self, message):
         """Handles on_message event."""
