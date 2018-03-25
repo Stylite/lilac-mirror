@@ -13,6 +13,7 @@ class Utility:
 
     @commands.command()
     async def emote(self, ctx, *, emote: str):
+        """Gets information on a custom emote."""
         emote_id = None
         try:
             emote_id = int(emote.split(':')[2][0:-1])

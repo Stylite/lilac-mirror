@@ -237,122 +237,6 @@ class Mod:
         await ctx.send(msg)
 
     @commands.group()
-    async def welcome(self, ctx):
-        """Manages the welcome message.
-        
-        To set the welcome message, do `welcome set <message>`.
-           - To mention the user who joined, use `%mention%` in the message.
-        To set the welcome channel, do `welcome channel <channel-mention>.`"""
-        if ctx.invoked_subcommand is None:
-            await ctx.send(
-                "To set the welcome message, do `welcome set <message>`.\n"+\
-                "    - To mention the user who joined, use `%mention%` in the message.\n"+\
-                "To set the welcome channel, do `welcome channel <channel-mention>.`"
-            )
-            return
-
-    @welcome.command(name='set')
-    @manage_guild()
-    async def _wmset(self, ctx, *, message: str):
-        dbcur = self.bot.database.cursor()
-        dbcur.execute(f'SELECT * FROM welcomes WHERE guild_id={ctx.message.guild.id}')
-        if len(dbcur.fetchall()) == 0:
-            dbcur.execute(f'INSERT INTO welcomes(guild_id,message,channel_id) VALUES (?,?,?)',\
-                         (ctx.message.guild.id, message, 0))
-        else:
-            dbcur.execute(f'''UPDATE welcomes SET message="{message}"
-                              WHERE guild_id={ctx.message.guild.id}''')
-
-        self.bot.database.commit()
-        dbcur.close()
-
-        await ctx.send(':white_check_mark: Set the welcome message for this guild.')
-
-    @welcome.command(name='channel')
-    @manage_guild()
-    async def _wmchannel(self, ctx, *, channel_mention: str):
-        """Sets the welcome channel for user join messages.
-
-        You must mention the channel."""
-        dbcur = self.bot.database.cursor()
-
-        dbcur.execute(f'SELECT * FROM welcomes WHERE guild_id={ctx.message.guild.id}')
-        if len(dbcur.fetchall()) == 0:
-            await ctx.send(':warning: You need to set a welcome message before setting the ' +\
-                           'welcome channel.')
-            return
-
-        if len(ctx.message.channel_mentions) == 0:
-            await ctx.send(':warning: You have not provided a channel mention for your welcome channel.')
-            return
-
-        dbcur.execute(f'''UPDATE welcomes SET channel_id={ctx.message.channel_mentions[0].id}
-                          WHERE guild_id={ctx.message.guild.id}''')
-
-        self.bot.database.commit()
-        dbcur.close()
-
-        await ctx.send(':white_check_mark: Set your welcome channel to `{}`.'
-                       .format(ctx.message.channel_mentions[0]))
-
-    @commands.group()
-    async def goodbye(self, ctx):
-        """Manages the goodbye message.
-        
-        To set the goodbye message, do `goodbye set <message>`.
-           - To get the username of the member who left, use `%name%` in the message.
-        To set the goodbye channel, do `goodbye channel <channel-mention>.`"""
-        if ctx.invoked_subcommand is None:
-            await ctx.send(
-                "To set the goodbye message, do `goodbye set <message>`.\n"+\
-                "    - To get the username of the member who left, use `%name%` in the message.\n"+\
-                "To set the goodbye channel, do `goodbye channel <channel-mention>.`"
-            )
-            return
-
-    @goodbye.command(name='set')
-    @manage_guild()
-    async def _gbmset(self, ctx, *, message: str):
-        dbcur = self.bot.database.cursor()
-        dbcur.execute(f'SELECT * FROM goodbyes WHERE guild_id={ctx.message.guild.id}')
-        if len(dbcur.fetchall()) == 0:
-            dbcur.execute(f'INSERT INTO goodbyes(guild_id,message,channel_id) VALUES (?,?,?)',\
-                         (ctx.message.guild.id, message, 0))
-        else:
-            dbcur.execute(f'''UPDATE goodbyes SET message="{message}"
-                              WHERE guild_id={ctx.message.guild.id}''')
-
-        self.bot.database.commit()
-        dbcur.close()
-
-        await ctx.send(':white_check_mark: Set the goodbye message for this guild.')
-
-    @goodbye.command(name='channel')
-    @manage_guild()
-    async def _gbmchannel(self, ctx, *, channel_mention: str):
-        dbcur = self.bot.database.cursor()
-
-        dbcur.execute(f'SELECT * FROM goodbyes WHERE guild_id={ctx.message.guild.id}')
-        if len(dbcur.fetchall()) == 0:
-            await ctx.send(':warning: You need to set a goodbye message before setting the ' +\
-                           'goodbye channel.')
-            return
-
-        if len(ctx.message.channel_mentions) == 0:
-            await ctx.send(':warning: You have not provided a channel mention for your goodbye channel.')
-            return
-
-        dbcur.execute(f'''UPDATE goodbyes SET channel_id={ctx.message.channel_mentions[0].id}
-                          WHERE guild_id={ctx.message.guild.id}''')
-
-        self.bot.database.commit()
-        dbcur.close()
-
-        await ctx.send(':white_check_mark: Set your goodbye channel to `{}`.'
-                       .format(ctx.message.channel_mentions[0]))
-
-
-    @commands.group()
     @manage_roles()
     async def selfrole(self, ctx):
         """Manages selfroles.
@@ -452,6 +336,159 @@ class Mod:
         dbcur.close()
 
         await ctx.send(msg)
+
+    @commands.group()
+    async def welcome(self, ctx):
+        """Manages the welcome message.
+        
+        To set the welcome message, do `welcome set <message>`.
+           - To mention the user who joined, use `%mention%` in the message.
+        To set the welcome channel, do `welcome channel <channel-mention>.`
+        To disable welcome messages, do `welcome disable.`"""
+        if ctx.invoked_subcommand is None:
+            await ctx.send(
+                "To set the welcome message, do `welcome set <message>`.\n"+\
+                "    - To mention the user who joined, use `%mention%` in the message.\n"+\
+                "To set the welcome channel, do `welcome channel <channel-mention>.`\n"+\
+                "To disable welcome messages, do `welcome disable`."
+            )
+            return
+
+    @welcome.command(name='set')
+    @manage_guild()
+    async def _wmset(self, ctx, *, message: str):
+        dbcur = self.bot.database.cursor()
+        dbcur.execute(f'SELECT * FROM welcomes WHERE guild_id={ctx.message.guild.id}')
+        if len(dbcur.fetchall()) == 0:
+            dbcur.execute(f'INSERT INTO welcomes(guild_id,message,channel_id) VALUES (?,?,?)',\
+                         (ctx.message.guild.id, message, 0))
+        else:
+            dbcur.execute(f'''UPDATE welcomes SET message="{message}"
+                              WHERE guild_id={ctx.message.guild.id}''')
+
+        self.bot.database.commit()
+        dbcur.close()
+
+        await ctx.send(':white_check_mark: Set the welcome message for this guild.')
+
+    @welcome.command(name='channel')
+    @manage_guild()
+    async def _wmchannel(self, ctx, *, channel_mention: str):
+        """Sets the welcome channel for user join messages.
+
+        You must mention the channel."""
+        dbcur = self.bot.database.cursor()
+
+        dbcur.execute(f'SELECT * FROM welcomes WHERE guild_id={ctx.message.guild.id}')
+        if len(dbcur.fetchall()) == 0:
+            await ctx.send(':warning: You need to set a welcome message before setting the ' +\
+                           'welcome channel.')
+            return
+
+        if len(ctx.message.channel_mentions) == 0:
+            await ctx.send(':warning: You have not provided a channel mention for your welcome channel.')
+            return
+
+        dbcur.execute(f'''UPDATE welcomes SET channel_id={ctx.message.channel_mentions[0].id}
+                          WHERE guild_id={ctx.message.guild.id}''')
+
+        self.bot.database.commit()
+        dbcur.close()
+
+        await ctx.send(':white_check_mark: Set your welcome channel to `{}`.'
+                       .format(ctx.message.channel_mentions[0]))
+
+    @welcome.command(name='disable')
+    @manage_guild()
+    async def _wmdisable(self, ctx):
+        dbcur = self.bot.database.cursor()
+
+        dbcur.execute(f'SELECT * FROM welcomes WHERE guild_id={ctx.message.guild.id}')
+        if len(dbcur.fetchall()) == 0:
+            await ctx.send(':stop_sign: This guild does not have welcome messages enabled!')
+            return
+        
+        dbcur.execute(f'DELETE FROM welcomes WHERE guild_id={ctx.message.guild.id}')
+
+        self.bot.database.commit()
+        dbcur.close()
+
+        await ctx.send(':thumbsup: Disabled welcome messages for this guild!')
+
+    @commands.group()
+    async def goodbye(self, ctx):
+        """Manages the goodbye message.
+        
+        To set the goodbye message, do `goodbye set <message>`.
+           - To get the username of the member who left, use `%name%` in the message.
+        To set the goodbye channel, do `goodbye channel <channel-mention>.`
+        To disable goodbye messages, do `goodbye disable`."""
+        if ctx.invoked_subcommand is None:
+            await ctx.send(
+                "To set the goodbye message, do `goodbye set <message>`.\n"+\
+                "    - To get the username of the member who left, use `%name%` in the message.\n"+\
+                "To set the goodbye channel, do `goodbye channel <channel-mention>.`\n"+\
+                "To disable goodbye messages, do `goodbye disable`."
+            )
+            return
+
+    @goodbye.command(name='set')
+    @manage_guild()
+    async def _gbmset(self, ctx, *, message: str):
+        dbcur = self.bot.database.cursor()
+        dbcur.execute(f'SELECT * FROM goodbyes WHERE guild_id={ctx.message.guild.id}')
+        if len(dbcur.fetchall()) == 0:
+            dbcur.execute(f'INSERT INTO goodbyes(guild_id,message,channel_id) VALUES (?,?,?)',\
+                         (ctx.message.guild.id, message, 0))
+        else:
+            dbcur.execute(f'''UPDATE goodbyes SET message="{message}"
+                              WHERE guild_id={ctx.message.guild.id}''')
+
+        self.bot.database.commit()
+        dbcur.close()
+
+        await ctx.send(':white_check_mark: Set the goodbye message for this guild.')
+
+    @goodbye.command(name='channel')
+    @manage_guild()
+    async def _gbmchannel(self, ctx, *, channel_mention: str):
+        dbcur = self.bot.database.cursor()
+
+        dbcur.execute(f'SELECT * FROM goodbyes WHERE guild_id={ctx.message.guild.id}')
+        if len(dbcur.fetchall()) == 0:
+            await ctx.send(':warning: You need to set a goodbye message before setting the ' +\
+                           'goodbye channel.')
+            return
+
+        if len(ctx.message.channel_mentions) == 0:
+            await ctx.send(':warning: You have not provided a channel mention for your goodbye channel.')
+            return
+
+        dbcur.execute(f'''UPDATE goodbyes SET channel_id={ctx.message.channel_mentions[0].id}
+                          WHERE guild_id={ctx.message.guild.id}''')
+
+        self.bot.database.commit()
+        dbcur.close()
+
+        await ctx.send(':white_check_mark: Set your goodbye channel to `{}`.'
+                       .format(ctx.message.channel_mentions[0]))
+
+    @goodbye.command(name='disable')
+    @manage_guild()
+    async def _gbmdisable(self, ctx):
+        dbcur = self.bot.database.cursor()
+
+        dbcur.execute(f'SELECT * FROM goodbyes WHERE guild_id={ctx.message.guild.id}')
+        if len(dbcur.fetchall()) == 0:
+            await ctx.send(':stop_sign: This guild does not have goodbye messages enabled!')
+            return
+        
+        dbcur.execute(f'DELETE FROM goodbyes WHERE guild_id={ctx.message.guild.id}')
+
+        self.bot.database.commit()
+        dbcur.close()
+
+        await ctx.send(':thumbsup: Disabled goodbye messages for this guild!')
 
     @commands.command()
     async def getrole(self, ctx, *, role_name: str):

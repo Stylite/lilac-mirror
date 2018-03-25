@@ -2,11 +2,13 @@
 import time
 import os
 import sys
+import sqlite3 as sqlite
 import traceback
 
 import yaml
-import sqlite3 as sqlite
+
 from cogs.util.logging import Logger
+import cogs.util.sender as sender_module
 
 from discord.ext import commands
 import discord
@@ -30,6 +32,8 @@ class Lilac(commands.AutoShardedBot):
         self.logger = Logger()
         sys.stderr = self.logger
         sys.stdout = self.logger
+        
+        self.send = sender_module.send
 
         self.up_at = time.time()
 
@@ -109,21 +113,23 @@ class Lilac(commands.AutoShardedBot):
         if isinstance(exception, commands.CommandInvokeError):
             exception = exception.original
             if isinstance(exception, discord.Forbidden):
-                await ctx.send(':warning: I don\'t have enough perms to do that.')
+                await self.send(ctx, ':warning: I don\'t have enough perms to do that.')
             else:
-                await ctx.send(f':warning: `CommandInvokeError`: ```{err}``` This should never happen, ' +
-                               'please report this to one of the developers.')
+                await self.send(ctx, \
+                    f':warning: `CommandInvokeError`: ```{err}```'+
+                    ' This should never happen, please report this to one of the developers.'
+                )
         elif isinstance(exception, commands.errors.BadArgument):
-            await ctx.send(f':warning: One or more of the arguments you just gave me are invalid.')
+            await self.send(ctx, f':warning: One or more of the arguments you just gave me are invalid.')
         elif isinstance(exception, commands.errors.MissingRequiredArgument):
             fmt_error = ''.join(exception.args)
-            await ctx.send(f':warning: {fmt_error}')
+            await self.send(ctx, f':warning: {fmt_error}')
         elif isinstance(exception, commands.CommandNotFound):
             pass
         elif isinstance(exception, commands.errors.CheckFailure):
-            await ctx.send(':warning: You don\'t have enough perms to perform that action.')
+            await self.send(ctx, ':warning: You don\'t have enough perms to perform that action.')
         else:
-            await ctx.send(f':warning: An error occured! ```{err}``` This should never happen;' +
+            await self.send(ctx, ':warning: An error occured! ```{err}``` This should never happen;' +
                            ' please report this to one of the developers.')
             self.logger.log('ERR', f'Error Occured:\n{err}')
 
