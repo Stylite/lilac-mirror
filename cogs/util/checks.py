@@ -34,3 +34,11 @@ def manage_roles():
             return True
         return False
     return commands.check(predicate)
+
+def manage_messages():
+    def predicate(ctx: commands.Context):
+        user_perms = ctx.message.author.guild_permissions
+        if user_perms.manage_messages:
+            return True
+        return False
+    return commands.check(predicate)

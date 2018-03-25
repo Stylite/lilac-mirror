@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import asyncio 
 import yaml
-from cogs.util.checks import manage_usrs, manage_guild, manage_roles
+from cogs.util.checks import manage_usrs, manage_guild, manage_roles, manage_messages
 
 from discord.ext import commands
 import discord
@@ -479,6 +479,7 @@ class Mod:
         await ctx.send(f':white_check_mark: Changed this guild\'s prefix to `{new_prefix}`')
 
     @commands.command()
+    @manage_messages()
     async def purge(self, ctx, *, number: int):
         """Purges a number of messages.
         
