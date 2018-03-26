@@ -18,12 +18,12 @@ class Utility:
         try:
             emote_id = int(emote.split(':')[2][0:-1])
         except IndexError:
-            await ctx.send(':warning: That\'s not a custom emote!')
+            await self.bot.send(ctx, ':warning: That\'s not a custom emote!')
             return
 
         emote_obj = self.bot.get_emoji(emote_id)
         if emote_obj is None:
-            await ctx.send(':warning: I couldn\'t get any information on that emote!')
+            await self.bot.send(ctx, ':warning: I couldn\'t get any information on that emote!')
             return
 
         to_send = discord.Embed(title=f'Info on emote {str(emote_obj)}', colour=0xbd8cbf)
@@ -33,13 +33,13 @@ class Utility:
         to_send.add_field(name='From Guild', value=emote_obj.guild.name, inline=True)
         to_send.add_field(name='Created At', value=str(emote_obj.created_at).split('.')[0], inline=True)
 
-        await ctx.send(embed=to_send)
+        await self.bot.send(ctx, embed=to_send)
 
     @commands.command()
     async def weather(self, ctx, *, location: str):
         location = self.weather_obj.lookup_by_location(location)
         if location is None:
-            await ctx.send(':x: I couldn\'t find any results for that location!')
+            await self.bot.send(ctx, ':x: I couldn\'t find any results for that location!')
             return
 
         wind_dir = ['north', 'east', 'south', 'west', 'north'][round(float(location.wind()["direction"])/90)]
@@ -50,7 +50,7 @@ class Utility:
                   f':droplet: | **Humidity:** {location.atmosphere()["humidity"]}%\n'+\
                   f':dash: | **Wind:** Blowing {wind_dir}; {round(0.277 * float(location.wind()["speed"]), 1)} m/s'
 
-        await ctx.send(to_send)
+        await self.bot.send(ctx, to_send)
 
     @commands.command()
     async def translate(self, ctx, translate_to: str, *, to_translate: str):
@@ -62,17 +62,17 @@ class Utility:
         try:
             translated = self.translator.translate(to_translate, dest=translate_to)
         except ValueError as e:
-            await ctx.send(':warning: That\'s not a valid language you can translate to.')
+            await self.bot.send(ctx, ':warning: That\'s not a valid language you can translate to.')
             return
         except:
-            await ctx.send(':warning: An error occured while attempting to contact Google Translate!')
+            await self.bot.send(ctx, ':warning: An error occured while attempting to contact Google Translate!')
             return
         
         to_send = discord.Embed(title='Translator Result', colour=0xbd8cbf)
         to_send.add_field(name=f'Input [{translated.src}]', value=f'```{to_translate}```', inline=False)
         to_send.add_field(name=f'Output [{translated.dest}]', value=f'```{translated.text}```', inline=False)
 
-        await ctx.send(embed=to_send)
+        await self.bot.send(ctx, embed=to_send)
 
 def setup(bot):
     bot.add_cog(Utility(bot))

@@ -42,9 +42,9 @@ class Fun:
         random.seed(question)
         choice = random.choice(choices)
         
-        await ctx.send('The Magic 8 Ball is spinning...')
+        await self.bot.send(ctx, 'The Magic 8 Ball is spinning...')
         await asyncio.sleep(1)
-        await ctx.send(':8ball: **The Magic 8 Ball says:** ```{}```'.format(choice))
+        await self.bot.send(ctx, ':8ball: **The Magic 8 Ball says:** ```{}```'.format(choice))
         
 def setup(bot):
     bot.add_cog(Fun(bot))

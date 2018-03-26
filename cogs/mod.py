@@ -41,7 +41,7 @@ class Mod:
         if ctx.message.mentions:
             to_mute = ctx.message.mentions[0]
         else:
-            await ctx.send(':warning: You did not mention a user to mute.')
+            await self.bot.send(ctx, ':warning: You did not mention a user to mute.')
 
         mute_role = None
         guild = ctx.message.guild
@@ -52,7 +52,7 @@ class Mod:
                 if role.name == 'lilac-mute':
                     mute_role = role
             if mute_role in to_mute.roles:
-                await ctx.send(f':warning: `{str(to_mute)}` is already muted!')
+                await self.bot.send(ctx, f':warning: `{str(to_mute)}` is already muted!')
                 return
 
         perm_overwrite_pair = (mute_role, discord.PermissionOverwrite(send_messages=False, \
@@ -62,7 +62,7 @@ class Mod:
                 await channel.set_permissions(perm_overwrite_pair[0], overwrite=perm_overwrite_pair[1])
 
         await to_mute.add_roles(mute_role)
-        await ctx.send(f':white_check_mark: I\'ve muted `{str(to_mute)}`! You can unmute them'+\
+        await self.bot.send(ctx, f':white_check_mark: I\'ve muted `{str(to_mute)}`! You can unmute them'+\
                         ' by removing their `lilac-mute` role, or by running `unmute @user`.')
 
     @commands.command()
@@ -73,10 +73,10 @@ class Mod:
         if ctx.message.mentions:
             to_unmute = ctx.message.mentions[0]
         else:
-            await ctx.send(':warning: You did not mention a user to unmute.')
+            await self.bot.send(ctx, ':warning: You did not mention a user to unmute.')
 
         if 'lilac-mute' not in [r.name for r in to_unmute.roles]:
-            await ctx.send(':warning: That user is not currently muted!')
+            await self.bot.send(ctx, ':warning: That user is not currently muted!')
             return
 
         mute_role = None
@@ -86,7 +86,7 @@ class Mod:
 
         await to_unmute.remove_roles(mute_role)
         
-        await ctx.send(f':white_check_mark: I\'ve unmuted `{str(to_unmute)}`! They can now speak!')
+        await self.bot.send(ctx, f':white_check_mark: I\'ve unmuted `{str(to_unmute)}`! They can now speak!')
             
 
     @commands.command()
@@ -99,11 +99,11 @@ class Mod:
         if ctx.message.mentions:
             to_ban = ctx.message.mentions[0]
         else:
-            await ctx.send(':warning: You did not mention a user to ban.')
+            await self.bot.send(ctx, ':warning: You did not mention a user to ban.')
             return
 
         await ctx.message.guild.ban(to_ban)
-        await ctx.send(':white_check_mark: Successfully banned user `{}#{}`'
+        await self.bot.send(ctx, ':white_check_mark: Successfully banned user `{}#{}`'
                        .format(to_ban.name, to_ban.discriminator))
 
     @commands.command()
@@ -116,11 +116,11 @@ class Mod:
         if ctx.message.mentions:
             to_kick = ctx.message.mentions[0]
         else:
-            await ctx.send(':warning: You did not mention a user to kick.')
+            await self.bot.send(ctx, ':warning: You did not mention a user to kick.')
             return
 
         await ctx.message.guild.kick(to_kick)
-        await ctx.send(':white_check_mark: Successfully kicked user `{}#{}`.'
+        await self.bot.send(ctx, ':white_check_mark: Successfully kicked user `{}#{}`.'
                        .format(to_kick.name, to_kick.discriminator))
 
     @commands.group()
@@ -131,7 +131,7 @@ class Mod:
         To remove an autorole, do `autorole remove <role-name>`. [Requires ManageRoles]
         To list autoroles, do `autorole list`."""
         if ctx.invoked_subcommand is None:
-            await ctx.send(
+            await self.bot.send(ctx, 
                 "To create an autorole, do `autorole add <role-name>`. [Requires ManageRoles]\n"+\
                 "To remove an autorole, do `autorole remove <role-name>`. [Requires ManageRoles]\n"+\
                 "To list autoroles, do `autorole list`.\n"
@@ -149,13 +149,13 @@ class Mod:
                 to_add = role
                 break
         else:
-            await ctx.send(f':warning: Role `{role_name}` not found.')
+            await self.bot.send(ctx, f':warning: Role `{role_name}` not found.')
             dbcur.close()
             return
 
         dbcur.execute(f'SELECT role_id FROM autoroles WHERE guild_id={ctx.message.guild.id}')
         if to_add.id in [x[0] for x in dbcur.fetchall()]:
-            await ctx.send(':warning: That role is already an autorole!')
+            await self.bot.send(ctx, ':warning: That role is already an autorole!')
             dbcur.close()
             return
 
@@ -165,7 +165,7 @@ class Mod:
         self.bot.database.commit()
         dbcur.close()
             
-        await ctx.send(f':white_check_mark: Role `{to_add.name}` added to autoroles.')
+        await self.bot.send(ctx, f':white_check_mark: Role `{to_add.name}` added to autoroles.')
 
     @autorole.command(name='remove')
     @manage_roles()
@@ -178,7 +178,7 @@ class Mod:
                 to_remove = role
                 break
         else:
-            await ctx.send(f':warning: Role `{role_name}` not found.')
+            await self.bot.send(ctx, f':warning: Role `{role_name}` not found.')
             dbcur.close()
             return
 
@@ -190,15 +190,15 @@ class Mod:
             if to_remove.id in autorole_ids:
                 dbcur.execute(f'DELETE FROM autoroles WHERE role_id={to_remove.id}')
             else:
-                await ctx.send(':warning: That role is not an autorole.')
+                await self.bot.send(ctx, ':warning: That role is not an autorole.')
                 dbcur.close()
                 return
         else:
-            await ctx.send(':warning: You currently do not have any autoroles.')
+            await self.bot.send(ctx, ':warning: You currently do not have any autoroles.')
             dbcur.close()
             return
 
-        await ctx.send(f':white_check_mark: Removed role `{to_remove.name}` from autoroles.')
+        await self.bot.send(ctx, f':white_check_mark: Removed role `{to_remove.name}` from autoroles.')
         
     @autorole.command(name='list')
     async def _arlist(self, ctx):
@@ -206,7 +206,7 @@ class Mod:
 
         dbcur.execute(f'SELECT * FROM autoroles WHERE guild_id={ctx.message.guild.id}')
         if len(dbcur.fetchall()) == 0:
-            await ctx.send(':warning: This guild does not have any autoroles.')
+            await self.bot.send(ctx, ':warning: This guild does not have any autoroles.')
             dbcur.close()
             return
 
@@ -223,7 +223,7 @@ class Mod:
                 dbcur.execute(f'DELETE FROM autoroles WHERE role_id={r_id}')
 
         if len(autorole_names) == 0:
-            await ctx.send('This guild does not have any autoroles.')
+            await self.bot.send(ctx, 'This guild does not have any autoroles.')
             return
 
         msg = 'This server\'s autoroles are: ```'
@@ -234,7 +234,7 @@ class Mod:
         self.bot.database.commit()
         dbcur.close()
 
-        await ctx.send(msg)
+        await self.bot.send(ctx, msg)
 
     @commands.group()
     @manage_roles()
@@ -245,7 +245,7 @@ class Mod:
         To remove a selfrole, do `,selfrole remove <role_name>`. [Requires ManageRoles]
         To list selfroles, do `,selfrole list`."""
         if ctx.invoked_subcommand is None:
-            await ctx.send(
+            await self.bot.send(ctx, 
                 "To create a selfrole, do `,selfrole add <role_name>`. [Requires ManageRoles]\n"+\
                 "To remove a selfrole, do `,selfrole remove <role_name>`. [Requires ManageRoles]\n"+\
                 "To list selfroles, do `,selfrole list`."
@@ -263,7 +263,7 @@ class Mod:
                 role = r
                 break
         else:
-            await ctx.send(f':warning: Role `{role_name}` was not found.')
+            await self.bot.send(ctx, f':warning: Role `{role_name}` was not found.')
             return
 
         dbcur.execute('INSERT INTO selfroles(guild_id, role_id) VALUES (?,?)',
@@ -272,7 +272,7 @@ class Mod:
         self.bot.database.commit()
         dbcur.close()
 
-        await ctx.send(f':white_check_mark: I have added `{role_name}` to selfroles!')
+        await self.bot.send(ctx, f':white_check_mark: I have added `{role_name}` to selfroles!')
 
     @selfrole.command(name='remove')
     @manage_roles()
@@ -285,12 +285,12 @@ class Mod:
                 role = r
                 break
         else:
-            await ctx.send(f':warning: Role `{role_name}` was not found.')
+            await self.bot.send(ctx, f':warning: Role `{role_name}` was not found.')
             return
 
         dbcur.execute(f'SELECT * FROM selfroles WHERE guild_id={ctx.message.guild.id}')
         if len(dbcur.fetchall()) == 0:
-            await ctx.send(f':warning: Your guild does not have any selfroles. ' +
+            await self.bot.send(ctx, f':warning: Your guild does not have any selfroles. ' +
                             'Thus, I cannot remove a role from the nonexistent selfroles list.')
             return
 
@@ -299,7 +299,7 @@ class Mod:
         self.bot.database.commit()
         dbcur.close()
 
-        await ctx.send(f':white_check_mark: Role `{role_name}` was removed from the selfroles!')
+        await self.bot.send(ctx, f':white_check_mark: Role `{role_name}` was removed from the selfroles!')
 
     @selfrole.command(name='list')
     async def _srlist(self, ctx):
@@ -308,7 +308,7 @@ class Mod:
         
         dbcur.execute(f'SELECT * FROM selfroles WHERE guild_id={ctx.message.guild.id}')
         if len(dbcur.fetchall()) == 0:
-            await ctx.send(':warning: This guild does not have any selfroles.')
+            await self.bot.send(ctx, ':warning: This guild does not have any selfroles.')
             return
 
         dbcur.execute(f'SELECT role_id FROM selfroles WHERE guild_id={ctx.message.guild.id}')
@@ -324,7 +324,7 @@ class Mod:
                 dbcur.execute(f'DELETE FROM selfroles WHERE role_id={r_id}')
 
         if len(selfrole_names) == 0:
-            await ctx.send(':warning: This guild does not have any selfroles.')
+            await self.bot.send(ctx, ':warning: This guild does not have any selfroles.')
             return
 
         msg = 'This server\'s selfroles are: ```'
@@ -335,7 +335,7 @@ class Mod:
         self.bot.database.commit()
         dbcur.close()
 
-        await ctx.send(msg)
+        await self.bot.send(ctx, msg)
 
     @commands.group()
     async def welcome(self, ctx):
@@ -346,7 +346,7 @@ class Mod:
         To set the welcome channel, do `welcome channel <channel-mention>.`
         To disable welcome messages, do `welcome disable.`"""
         if ctx.invoked_subcommand is None:
-            await ctx.send(
+            await self.bot.send(ctx, 
                 "To set the welcome message, do `welcome set <message>`.\n"+\
                 "    - To mention the user who joined, use `%mention%` in the message.\n"+\
                 "To set the welcome channel, do `welcome channel <channel-mention>.`\n"+\
@@ -369,7 +369,7 @@ class Mod:
         self.bot.database.commit()
         dbcur.close()
 
-        await ctx.send(':white_check_mark: Set the welcome message for this guild.')
+        await self.bot.send(ctx, ':white_check_mark: Set the welcome message for this guild.')
 
     @welcome.command(name='channel')
     @manage_guild()
@@ -381,12 +381,12 @@ class Mod:
 
         dbcur.execute(f'SELECT * FROM welcomes WHERE guild_id={ctx.message.guild.id}')
         if len(dbcur.fetchall()) == 0:
-            await ctx.send(':warning: You need to set a welcome message before setting the ' +\
+            await self.bot.send(ctx, ':warning: You need to set a welcome message before setting the ' +\
                            'welcome channel.')
             return
 
         if len(ctx.message.channel_mentions) == 0:
-            await ctx.send(':warning: You have not provided a channel mention for your welcome channel.')
+            await self.bot.send(ctx, ':warning: You have not provided a channel mention for your welcome channel.')
             return
 
         dbcur.execute(f'''UPDATE welcomes SET channel_id={ctx.message.channel_mentions[0].id}
@@ -395,7 +395,7 @@ class Mod:
         self.bot.database.commit()
         dbcur.close()
 
-        await ctx.send(':white_check_mark: Set your welcome channel to `{}`.'
+        await self.bot.send(ctx, ':white_check_mark: Set your welcome channel to `{}`.'
                        .format(ctx.message.channel_mentions[0]))
 
     @welcome.command(name='disable')
@@ -405,7 +405,7 @@ class Mod:
 
         dbcur.execute(f'SELECT * FROM welcomes WHERE guild_id={ctx.message.guild.id}')
         if len(dbcur.fetchall()) == 0:
-            await ctx.send(':stop_sign: This guild does not have welcome messages enabled!')
+            await self.bot.send(ctx, ':stop_sign: This guild does not have welcome messages enabled!')
             return
         
         dbcur.execute(f'DELETE FROM welcomes WHERE guild_id={ctx.message.guild.id}')
@@ -413,7 +413,7 @@ class Mod:
         self.bot.database.commit()
         dbcur.close()
 
-        await ctx.send(':thumbsup: Disabled welcome messages for this guild!')
+        await self.bot.send(ctx, ':thumbsup: Disabled welcome messages for this guild!')
 
     @commands.group()
     async def goodbye(self, ctx):
@@ -424,7 +424,7 @@ class Mod:
         To set the goodbye channel, do `goodbye channel <channel-mention>.`
         To disable goodbye messages, do `goodbye disable`."""
         if ctx.invoked_subcommand is None:
-            await ctx.send(
+            await self.bot.send(ctx, 
                 "To set the goodbye message, do `goodbye set <message>`.\n"+\
                 "    - To get the username of the member who left, use `%name%` in the message.\n"+\
                 "To set the goodbye channel, do `goodbye channel <channel-mention>.`\n"+\
@@ -447,7 +447,7 @@ class Mod:
         self.bot.database.commit()
         dbcur.close()
 
-        await ctx.send(':white_check_mark: Set the goodbye message for this guild.')
+        await self.bot.send(ctx, ':white_check_mark: Set the goodbye message for this guild.')
 
     @goodbye.command(name='channel')
     @manage_guild()
@@ -456,12 +456,12 @@ class Mod:
 
         dbcur.execute(f'SELECT * FROM goodbyes WHERE guild_id={ctx.message.guild.id}')
         if len(dbcur.fetchall()) == 0:
-            await ctx.send(':warning: You need to set a goodbye message before setting the ' +\
+            await self.bot.send(ctx, ':warning: You need to set a goodbye message before setting the ' +\
                            'goodbye channel.')
             return
 
         if len(ctx.message.channel_mentions) == 0:
-            await ctx.send(':warning: You have not provided a channel mention for your goodbye channel.')
+            await self.bot.send(ctx, ':warning: You have not provided a channel mention for your goodbye channel.')
             return
 
         dbcur.execute(f'''UPDATE goodbyes SET channel_id={ctx.message.channel_mentions[0].id}
@@ -470,7 +470,7 @@ class Mod:
         self.bot.database.commit()
         dbcur.close()
 
-        await ctx.send(':white_check_mark: Set your goodbye channel to `{}`.'
+        await self.bot.send(ctx, ':white_check_mark: Set your goodbye channel to `{}`.'
                        .format(ctx.message.channel_mentions[0]))
 
     @goodbye.command(name='disable')
@@ -480,7 +480,7 @@ class Mod:
 
         dbcur.execute(f'SELECT * FROM goodbyes WHERE guild_id={ctx.message.guild.id}')
         if len(dbcur.fetchall()) == 0:
-            await ctx.send(':stop_sign: This guild does not have goodbye messages enabled!')
+            await self.bot.send(ctx, ':stop_sign: This guild does not have goodbye messages enabled!')
             return
         
         dbcur.execute(f'DELETE FROM goodbyes WHERE guild_id={ctx.message.guild.id}')
@@ -488,7 +488,7 @@ class Mod:
         self.bot.database.commit()
         dbcur.close()
 
-        await ctx.send(':thumbsup: Disabled goodbye messages for this guild!')
+        await self.bot.send(ctx, ':thumbsup: Disabled goodbye messages for this guild!')
 
     @commands.command()
     async def getrole(self, ctx, *, role_name: str):
@@ -501,28 +501,28 @@ class Mod:
                 role = r
                 break
         else:
-            await ctx.send(f':warning: Role `{role_name}` was not found.')
+            await self.bot.send(ctx, f':warning: Role `{role_name}` was not found.')
             return
 
         if role in ctx.message.author.roles:
-            await ctx.send(':warning: You already have that role.')
+            await self.bot.send(ctx, ':warning: You already have that role.')
             return
 
         dbcur.execute(f'SELECT * FROM selfroles WHERE guild_id={ctx.message.guild.id}')
         if len(dbcur.fetchall()) == 0:
-            await ctx.send(':warning: That role isn\'t a selfrole -- in fact, this guild ' +
+            await self.bot.send(ctx, ':warning: That role isn\'t a selfrole -- in fact, this guild ' +
                            'doesn\'t even have any selfroles.')
             return
 
         dbcur.execute(f'SELECT role_id FROM selfroles WHERE guild_id={ctx.message.guild.id}')
         if role.id not in [x[0] for x in dbcur.fetchall()]:
-            await ctx.send(':warning: That role isn\'t a selfrole.')
+            await self.bot.send(ctx, ':warning: That role isn\'t a selfrole.')
             return
 
         dbcur.close()
 
         await ctx.message.author.add_roles(role)
-        await ctx.send(f':white_check_mark: **{ctx.message.author.name}**, you now have `{role.name}` role.')
+        await self.bot.send(ctx, f':white_check_mark: **{ctx.message.author.name}**, you now have `{role.name}` role.')
 
     @commands.command(aliases=['loserole'])
     async def droprole(self, ctx, *, role_name: str):
@@ -535,28 +535,28 @@ class Mod:
                 role = r
                 break
         else:
-            await ctx.send(f':warning: Role `{role_name}` was not found.')
+            await self.bot.send(ctx, f':warning: Role `{role_name}` was not found.')
             return
 
         if role not in ctx.message.author.roles:
-            await ctx.send(':warning: You do not have that role.')
+            await self.bot.send(ctx, ':warning: You do not have that role.')
             return
 
         dbcur.execute(f'SELECT * FROM selfroles WHERE guild_id={ctx.message.guild.id}')
         if len(dbcur.fetchall()) == -0:
-            await ctx.send(':warning: That role isn\'t a selfrole -- in fact, this guild ' +
+            await self.bot.send(ctx, ':warning: That role isn\'t a selfrole -- in fact, this guild ' +
                            'doesn\'t even have any selfroles.')
             return
 
         dbcur.execute(f'SELECT role_id FROM selfroles WHERE guild_id={ctx.message.guild.id}')
         if role.id not in [x[0] for x in dbcur.fetchall()]:
-            await ctx.send(':warning: That role isn\'t a selfrole.')
+            await self.bot.send(ctx, ':warning: That role isn\'t a selfrole.')
             return
 
         dbcur.close()
 
         await ctx.message.author.remove_roles(role)
-        await ctx.send(f':white_check_mark: **{ctx.message.author.name}**, you no longer have `{role.name}` role.')
+        await self.bot.send(ctx, f':white_check_mark: **{ctx.message.author.name}**, you no longer have `{role.name}` role.')
 
     @commands.command()
     @manage_guild()
@@ -565,7 +565,7 @@ class Mod:
         self.bot.prefixes[ctx.message.guild.id] = new_prefix
         yaml.dump(self.bot.prefixes, open('data/prefixes.yml', 'w'))
 
-        await ctx.send(f':white_check_mark: Changed this guild\'s prefix to `{new_prefix}`')
+        await self.bot.send(ctx, f':white_check_mark: Changed this guild\'s prefix to `{new_prefix}`')
 
     @commands.command()
     @manage_messages()
@@ -574,14 +574,14 @@ class Mod:
         
         Number must be between 1 & 100."""
         if number < 1 or number > 100:
-            await ctx.send(':warning: I can only purge between 1 and 100 messages!') 
+            await self.bot.send(ctx, ':warning: I can only purge between 1 and 100 messages!') 
             return
         
         async for message in ctx.message.channel.history(limit=number):
             await message.delete()
             await asyncio.sleep(0.2)
 
-        notif_msg = await ctx.send(f':white_check_mark: I\'ve purged {number} messages for you!')
+        notif_msg = await self.bot.send(ctx, f':white_check_mark: I\'ve purged {number} messages for you!')
         await asyncio.sleep(7.0)
         await notif_msg.delete()
 

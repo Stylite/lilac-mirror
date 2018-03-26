@@ -126,14 +126,14 @@ class Misc:
                     break
 
             if found == [False, False]:
-                await ctx.send('Sorry, but I couldn\'t find that category/command!')
+                await self.bot.send(ctx, 'Sorry, but I couldn\'t find that category/command!')
                 return
 
         else:
-            await ctx.send(':warning: Too many arguments.')
+            await self.bot.send(ctx, ':warning: Too many arguments.')
             return
 
-        await ctx.send(embed=send)
+        await self.bot.send(ctx, embed=send)
 
 
 def setup(bot):

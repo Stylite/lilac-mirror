@@ -28,10 +28,10 @@ class Dev:
             self.bot.unload_extension(cog)
             self.bot.load_extension(cog)
         except Exception as e:
-            await ctx.send(':warning: Failed to reload cog `{}`, because:```{}```'.format(cog, str(e)))
+            await self.bot.send(ctx, ':warning: Failed to reload cog `{}`, because:```{}```'.format(cog, str(e)))
             self.bot.logger.log('LOAD', f'Failed to reload cog `{cog}`, because:\n\t{str(e)}')
         else:
-            await ctx.send(f':white_check_mark: Reloaded cog `{cog}`')
+            await self.bot.send(ctx, f':white_check_mark: Reloaded cog `{cog}`')
             self.bot.logger.log('LOAD', f'Reloaded cog `{cog}`')
 
     @commands.command(aliases=['reboot'])
@@ -40,13 +40,13 @@ class Dev:
         """Restarts the bot.
 
         Developer only command."""
-        await ctx.send(':warning: Rebooting Lilac...')
+        await self.bot.send(ctx, ':warning: Rebooting Lilac...')
         os.execl(sys.executable, sys.executable, * sys.argv)
-        await ctx.send(':white_check_mark: Done rebooting!')
 
     @commands.command(aliases=['shutdown'])
     async def shutoff(self, ctx):
-        await ctx.send(':white_check_mark: Shutting down!')
+        """Shuts the bot off."""
+        await self.bot.send(ctx, ':white_check_mark: Shutting down!')
         sys.exit()
 
     @commands.command(aliases=['evaluate'])
@@ -64,13 +64,13 @@ class Dev:
             func = env['func']
             res = await func(ctx)
         except Exception as e:
-            await ctx.send(f':warning: Error: ```{str(e)}```')
+            await self.bot.send(ctx, f':warning: Error: ```{str(e)}```')
             return
         else:
             if res is None:
                 await ctx.message.add_reaction('✅')
             else:
-                await ctx.send(f':white_check_mark: Executed successfully. ```{res}```')
+                await self.bot.send(ctx, f':white_check_mark: Executed successfully. ```{res}```')
 
     @commands.command(aliases=['pgit'])
     @is_cleared()
@@ -80,7 +80,7 @@ class Dev:
         Developer only command.
         This will pull code from Git, effectively overwriting
         all local changes not pushed to Git."""
-        await ctx.send(':warning: Pulling from Git! This will overwrite all local changes!')
+        await self.bot.send(ctx, ':warning: Pulling from Git! This will overwrite all local changes!')
 
         output = []
         outerr = []
@@ -104,7 +104,7 @@ class Dev:
             outerr = '- ' + '\n- '.join(outerr.decode().splitlines())
         else:
             outerr = ''
-        await ctx.send(f'**Git Response:** ```diff\n{output}{outerr}```')
+        await self.bot.send(ctx, f'**Git Response:** ```diff\n{output}{outerr}```')
 
     @commands.command(aliases=['bl'])
     @is_cleared()
@@ -115,19 +115,19 @@ class Dev:
         **Do not mention the user**, use the user id."""
         user = self.bot.get_user(user_id)
         if user is None:
-            await ctx.send(':warning: I couldn\'t find that user.')
+            await self.bot.send(ctx, ':warning: I couldn\'t find that user.')
             return
 
         if user_id in self.bot.blacklist:
-            await ctx.send(':warning: That user has alreaady been blacklisted!')
+            await self.bot.send(ctx, ':warning: That user has alreaady been blacklisted!')
 
         self.bot.blacklist.append(user_id)
         with open('data/gblacklist.txt', 'a') as blacklist_file:
             blacklist_file.write(str(user_id) + '\n')
-        await ctx.send(f':white_check_mark: **{ctx.message.author.name}**' +
+        await self.bot.send(ctx, f':white_check_mark: **{ctx.message.author.name}**' +
                        f', I\'ve blacklisted `{user}` from using Lilac commands!')
 
-        await user.send('You\'ve been blacklisted from using Lilac commands globally.' +
+        await self.bot.send(user, 'You\'ve been blacklisted from using Lilac commands globally.' +
                         ' Contact one of the devs to appeal.')
 
     @commands.command(aliases=['wl'])
@@ -139,11 +139,11 @@ class Dev:
         **Do not mention the user**, use the user id."""
         user = self.bot.get_user(user_id)
         if user is None:
-            await ctx.send(':warning: I couldn\'t find that user.')
+            await self.bot.send(ctx, ':warning: I couldn\'t find that user.')
             return
 
         if user_id not in self.bot.blacklist:
-            await ctx.send(':warning: That user is not blacklisted!' +
+            await self.bot.send(ctx, ':warning: That user is not blacklisted!' +
                            ' You cannot whitelist someone who has not been blacklisted.')
             return
 
@@ -151,10 +151,10 @@ class Dev:
         with open('data/gblacklist.txt', 'w') as blacklist_file:
             blacklist_file.writelines([str(uid) for uid in self.bot.blacklist])
 
-        await ctx.send(f':white_check_mark: I\'ve whitelisted `{user}`.' +
+        await self.bot.send(ctx, f':white_check_mark: I\'ve whitelisted `{user}`.' +
                        ' They are now able to use Lilac commands.')
 
-        await user.send('You\'ve been whitelisted to use Lilac commands, which means you are now ' +
+        await self.bot.send(user, 'You\'ve been whitelisted to use Lilac commands, which means you are now ' +
                         'unblacklisted -- you can use Lilac commands.')
 
     @commands.command()
@@ -165,15 +165,15 @@ class Dev:
         Use their user ID."""
         user = self.bot.get_user(user_id)
         if user is None:
-            await ctx.send(':warning: I couldn\'t find that user!')
+            await self.bot.send(ctx, ':warning: I couldn\'t find that user!')
 
         to_send = discord.Embed()
         to_send.colour = 0xbd8cbf
         to_send.description = message
         to_send.set_footer(text='A message from the developers of Lilac.')
 
-        await user.send(embed=to_send)
-        await ctx.send(':white_check_mark: I\'ve DMed that user with your message!')
+        await self.bot.send(user, embed=to_send)
+        await self.bot.send(ctx, ':white_check_mark: I\'ve DMed that user with your message!')
 
     @commands.command()
     @is_cleared()
@@ -186,7 +186,7 @@ class Dev:
                 found_user = user
                 break
         else:
-            await ctx.send(':warning: I couldn\'t find that user!')
+            await self.bot.send(ctx, ':warning: I couldn\'t find that user!')
             return
 
         to_send = discord.Embed(title='Result found for user')
@@ -197,7 +197,7 @@ class Dev:
         to_send.add_field(name="Part of Guild", value=str(found_user.guild.name))
         to_send.add_field(name="Account Created", value=str(found_user.created_at))
 
-        await ctx.send(embed=to_send)
+        await self.bot.send(ctx, embed=to_send)
 
     @commands.command()
     @is_cleared()
@@ -209,7 +209,7 @@ class Dev:
                 found_guild = guild
                 break
         else:
-            await ctx.send(':warning: I couldn\'t find that guild!')
+            await self.bot.send(ctx, ':warning: I couldn\'t find that guild!')
             return
 
         invite = await found_guild.channels[0].create_invite()
@@ -225,14 +225,14 @@ class Dev:
         to_send.add_field(name='Verification Level', value=str(verification_lvl))
         to_send.add_field(name='Region', value=str(found_guild.region))
 
-        await ctx.send(embed=to_send)
+        await self.bot.send(ctx, embed=to_send)
 
     @commands.command()
     @is_cleared()
     async def getlog(self, ctx, *, count: int):
         """Gets the last <count> log items."""
         logs = self.bot.logger.get_log(count)
-        await ctx.send(f'Here are the last **{count}** log items:\n```css\n{logs}\n```')
+        await self.bot.send(ctx, f'Here are the last **{count}** log items:\n```css\n{logs}\n```')
 
     @commands.command()
     @is_cleared()
@@ -243,9 +243,9 @@ class Dev:
         try:
             os.system(command)
         except Exception as e:
-            await ctx.send(f':warning: Error occured in executing command: `{str(e)}`')
+            await self.bot.send(ctx, f':warning: Error occured in executing command: `{str(e)}`')
         else:
-            await ctx.send(':white_check_mark: Successfully executed command.')
+            await self.bot.send(ctx, ':white_check_mark: Successfully executed command.')
         
 
     @commands.command()
@@ -281,7 +281,8 @@ class Dev:
         yaml.dump(yml_file, open(file_name, 'w'))
         self.bot.load_files()
 
-        await ctx.send(
+        await self.bot.send(
+            ctx, 
             ':white_check_mark:'+\
             '```'+\
             f'"{file_name}"[{key}] = {val}'+\

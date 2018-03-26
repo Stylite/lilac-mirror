@@ -55,7 +55,8 @@ class Economy:
         To check the pool's size, do `pool check`.
         To put the pool out, do `,pool out` [Requires ManageGuild]"""
         if ctx.invoked_subcommand is None:
-            await ctx.send(
+            await self.bot.send(
+                ctx,
                 "To start a pool, do `pool start`. [Requires ManageGuild]\n"+\
                 "To put <:lilac:419730009234866176> into the pool, do `pool add <amt>`.\n"+\
                 "To check the pool's size, do `pool check`.\n"+\
@@ -71,7 +72,7 @@ class Economy:
         self.bot.database.commit()
         dbcur.close()
 
-        await ctx.send(f':white_check_mark: I\'ve started a {self.lilac} pool! '+\
+        await self.bot.send(ctx, f':white_check_mark: I\'ve started a {self.lilac} pool! '+\
                         f'Members of this guild can put some {self.lilac} in the pool by doing '+\
                         f'`pool add <some-amt>`. When you feel the pool has reached a high enough size, '+\
                         f'run `pool out` and all of the {self.lilac} in the pool will be given to a random '+\
@@ -85,17 +86,19 @@ class Economy:
         dbcur = self.bot.database.cursor()
         dbcur.execute(f'SELECT * FROM pools WHERE guild_id={guild.id}')
         if len(dbcur.fetchall()) == 0:
-            await ctx.send(':x: This guild is not currently hosting a pool event!')
+            await self.bot.send(ctx, ':x: This guild is not currently hosting a pool event!')
             dbcur.close()
             return
 
         dbcur.execute(f'SELECT * FROM economy WHERE id={user.id}')
         user_bal = dbcur.fetchall()[0][1]
         if amt > user_bal:
-            await ctx.send(f':warning: You don\'t have enough {self.lilac} to make that pool contribution!')
+            await self.bot.send(ctx, \
+                    f':warning: You don\'t have enough {self.lilac} to make that pool contribution!')
             return
         if amt < 0:
-            await ctx.send(f':warning: You can\'t put a negative number of {self.lilac} into the pool!')
+            await self.bot.send(ctx, \
+                    f':warning: You can\'t put a negative number of {self.lilac} into the pool!')
             return
 
         dbcur.execute(f'UPDATE economy SET balance=balance-{amt} WHERE id={user.id}')
@@ -104,7 +107,7 @@ class Economy:
         dbcur.close()
         self.bot.database.commit()
 
-        await ctx.send(f':white_check_mark: I\'ve put {self.lilac}**{amt}** from your'+\
+        await self.bot.send(ctx, f':white_check_mark: I\'ve put {self.lilac}**{amt}** from your'+\
                         ' account into the pool!')
 
     @pool.command(name='check')
@@ -115,7 +118,7 @@ class Economy:
         dbcur.execute(f'SELECT * FROM pools WHERE guild_id={guild.id}')
         in_pool = dbcur.fetchall()[0][1]
 
-        await ctx.send(f'This guild currently has {self.lilac}**{in_pool}** in its pool.')
+        await self.bot.send(ctx, f'This guild currently has {self.lilac}**{in_pool}** in its pool.')
         dbcur.close()
             
     @pool.command(name='out')
@@ -126,7 +129,7 @@ class Economy:
         dbcur = self.bot.database.cursor()
         dbcur.execute(f'SELECT * FROM pools WHERE guild_id={guild.id}')
         if len(dbcur.fetchall()) == 0:
-            await ctx.send(':x: This guild is not currently hosting a pool event!')
+            await self.bot.send(ctx, ':x: This guild is not currently hosting a pool event!')
             dbcur.close()
             return
 
@@ -134,7 +137,7 @@ class Economy:
         winner = random.choice([m for m in guild.members if not m.bot])
         pool_total = dbcur.fetchall()[0][1]
 
-        await ctx.send(f'**{str(winner)}** has won the pool! {self.lilac}**{pool_total}** goes to them!')
+        await self.bot.send(ctx, f'**{str(winner)}** has won the pool! {self.lilac}**{pool_total}** goes to them!')
 
         self.check_bank_account(winner)
 
@@ -154,7 +157,7 @@ class Economy:
         bal = dbcur.fetchall()[0][1]
         dbcur.close()
 
-        await ctx.send(f'**{user.name}**, your balance is {self.lilac}**{bal}**.')
+        await self.bot.send(ctx, f'**{user.name}**, your balance is {self.lilac}**{bal}**.')
 
     @commands.command()
     async def daily(self, ctx):
@@ -172,7 +175,7 @@ class Economy:
             dbcur.execute(f'UPDATE economy SET balance=balance+{daily_amt} WHERE id={user.id}')
             dbcur.execute(f'UPDATE economy SET daily={time.time()} WHERE id={user.id}')
 
-            await ctx.send(f':white_check_mark: **{user.name}**, you collected your' +
+            await self.bot.send(ctx, f':white_check_mark: **{user.name}**, you collected your' +
                            f' daily of {self.lilac}**{daily_amt}**!')
         else:
             remain = 72000 - (time.time() - daily_last_collected)
@@ -181,7 +184,7 @@ class Economy:
                 int((remain - (int((remain - remain % 3600)/3600)*3600))//60)
             ]
 
-            await ctx.send(f':clock1030: You must wait another **{remaining[0]}** hours' +
+            await self.bot.send(ctx, f':clock1030: You must wait another **{remaining[0]}** hours' +
                            f' and **{remaining[1]}** minutes before collecting your next daily.')
 
         self.bot.database.commit()
@@ -205,10 +208,10 @@ class Economy:
         dbcur.execute(f'SELECT * FROM economy WHERE id={user.id}')
         current_bal = dbcur.fetchall()[0][1]
         if amount > current_bal:
-            await ctx.send(f':warning: You don\'t have enough {self.lilac} to make that tribute!')
+            await self.bot.send(ctx, f':warning: You don\'t have enough {self.lilac} to make that tribute!')
             return
         if amount < 0:
-            await ctx.send(f':warning: You can\'t tribute less than {self.lilac}**0**!')
+            await self.bot.send(ctx, f':warning: You can\'t tribute less than {self.lilac}**0**!')
             return 
 
         random.seed(str(amount) + str(time.time()))
@@ -225,7 +228,7 @@ class Economy:
 
             dbcur.execute(f'SELECT * FROM economy WHERE id={user.id}')
             bal = dbcur.fetchall()[0][1]
-            await ctx.send(f':exclamation: The gods don\'t like your offering of {self.lilac}**{amount}**!\n' +\
+            await self.bot.send(ctx, f':exclamation: The gods don\'t like your offering of {self.lilac}**{amount}**!\n' +\
                            f'They take away {self.lilac}**{take_away}** from you, leaving you with' +\
                            f' {self.lilac}**{bal}**!')
         else:
@@ -234,7 +237,7 @@ class Economy:
             dbcur.execute(f'SELECT * FROM economy WHERE id={user.id}')
             bal = dbcur.fetchall()[0][1]
 
-            await ctx.send(f':thumbsup: The gods love your offering of {self.lilac}**{amount}**!\n' +\
+            await self.bot.send(ctx, f':thumbsup: The gods love your offering of {self.lilac}**{amount}**!\n' +\
                            f'They give you {self.lilac}**{give_to}**, leaving you with' +\
                            f' {self.lilac}**{bal}**!')
 
@@ -251,7 +254,7 @@ class Economy:
 
         give_to = None
         if len(ctx.message.mentions) == 0:
-            await ctx.send(f':warning: You must mention a user to give {self.lilac} to!')
+            await self.bot.send(ctx, f':warning: You must mention a user to give {self.lilac} to!')
             return
         else:
             give_to = ctx.message.mentions[0]
@@ -261,7 +264,7 @@ class Economy:
         dbcur.execute(f'SELECT * FROM economy WHERE id={user.id}')
         user_bal = dbcur.fetchall()[0][1]
         if user_bal < amt:
-            await ctx.send(f':warning: You don\'t have enough {self.lilac} to make that transaction!')
+            await self.bot.send(ctx, f':warning: You don\'t have enough {self.lilac} to make that transaction!')
             return
 
         self.check_bank_account(give_to)
@@ -272,7 +275,7 @@ class Economy:
         self.bot.database.commit()
         dbcur.close()
 
-        await ctx.send(f':white_check_mark: I\'ve transferred {self.lilac}**{amt}**'+\
+        await self.bot.send(ctx, f':white_check_mark: I\'ve transferred {self.lilac}**{amt}**'+\
                         f' from your account into **{give_to.name}**\'s account!')
 
         
