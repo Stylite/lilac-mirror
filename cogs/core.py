@@ -35,9 +35,21 @@ class Core:
         to_send = discord.Embed(title="Support Server", description="https://discord.gg/EcW7kfa",\
                                 colour=0xbd8cbf)
         await self.bot.send(ctx, embed=to_send)
+
+    @commands.command()
+    async def info(self, ctx);
+        """Gives you basic info about the bot."""
+        await self.bot.send(
+            ctx, 
+            "Lilac is a general-purpose Discord bot that is currently in development.\n\n"+\
+            "__**Invite Lilac to your server:**__ \n"+\
+            "  [Click Here](https://discordapp.com/api/oauth2/authorize?client_id=405231585051410442&permissions=8&scope=bot)\n"+\
+            "__**Upvote Lilac on Discord Bot List:**__ \n"+\
+            "  [Click Here](https://discordbots.org/bot/405231585051410442/vote)\n"
+        )
     
     @commands.command()
-    async def info(self, ctx):
+    async def stats(self, ctx):
         """Gives you statistics about the bot."""
         cmdsexec = self.bot.info['commands']
         memuse = str(round(psutil.Process(os.getpid()).memory_info().rss/1000000, 1)) + ' MB'

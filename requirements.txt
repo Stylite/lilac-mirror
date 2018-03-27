@@ -3,3 +3,4 @@ PyYaml
 psutil
 googletrans
 weather-api
+Pillow
