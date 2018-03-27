@@ -37,7 +37,7 @@ class Core:
         await self.bot.send(ctx, embed=to_send)
 
     @commands.command()
-    async def info(self, ctx);
+    async def info(self, ctx):
         """Gives you basic info about the bot."""
         await self.bot.send(
             ctx, 
