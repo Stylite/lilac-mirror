@@ -42,9 +42,9 @@ class Core:
         await self.bot.send(
             ctx, 
             "Lilac is a general-purpose Discord bot that is currently in development.\n\n"+\
-            "__**Invite Lilac to your server:**__ \n"+\
+            "**Invite Lilac to your server:** \n"+\
             "  [Click Here](https://discordapp.com/api/oauth2/authorize?client_id=405231585051410442&permissions=8&scope=bot)\n"+\
-            "__**Upvote Lilac on Discord Bot List:**__ \n"+\
+            "**Upvote Lilac on Discord Bot List:** \n"+\
             "  [Click Here](https://discordbots.org/bot/405231585051410442/vote)\n"
         )
     
