@@ -74,6 +74,7 @@ class Utility:
 
     @commands.command()
     async def weather(self, ctx, *, location: str):
+        """Gets the weather for a location."""
         location = self.weather_obj.lookup_by_location(location)
         if location is None:
             await self.bot.send(ctx, ':x: I couldn\'t find any results for that location!')
