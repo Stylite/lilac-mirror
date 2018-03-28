@@ -32,6 +32,23 @@ class Utility:
         await ctx.send(file=discord.File('img/blur.png'))
 
     @commands.command()
+    async def sharpen(self, ctx, *, image_url: str):
+        """Sharpens an image.
+        
+        Image URL must be a valid url the bot can get an image from."""
+        image = None
+        try:
+            image = Image.open(requests.get(image_url, stream=True).raw)
+        except OSError:
+            await self.bot.send(ctx, ":warning: I couldn't find an image at that URL!")
+            return
+
+        sharpened_image = image.filter(ImageFilter.SHARPEN)
+        sharpened_image.save('img/sharpen.png')
+
+        await ctx.send(file=discord.File('img/sharpen.png'))
+
+    @commands.command()
     async def emote(self, ctx, *, emote: str):
         """Gets information on a custom emote."""
         emote_id = None
