@@ -1,5 +1,8 @@
 #!/usr/bin/env python
+import requests
+
 from weather import Weather, Unit
+from PIL import Image, ImageFilter
 import googletrans
 
 from discord.ext import commands
@@ -10,6 +13,22 @@ class Utility:
         self.bot = bot
         self.translator = googletrans.Translator()
         self.weather_obj = Weather(unit=Unit.CELSIUS)
+
+    @commands.command()
+    async def blur(self, ctx, *, image_url: str):
+        """Blurs an image.
+        
+        Image URL must be a valid url the bot can get an image from."""
+        image = None
+        try:
+            image = Image.open(requests.get(image_url, stream=True).raw)
+        except OSError:
+            await self.bot.send(ctx, ":warning: I couldn't find an image at that URL!")
+
+        blurred_image = image.filter(ImageFilter.BLUR)
+        blurred_image.save(f'img/blur.{blurred_image.format}')
+
+        await ctx.send(file=discord.File(f'img/blur.{blurred_image.format}'))
 
     @commands.command()
     async def emote(self, ctx, *, emote: str):

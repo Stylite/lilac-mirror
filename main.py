@@ -56,6 +56,8 @@ class Lilac(commands.AutoShardedBot):
         """Updates data files; ensures all are in place"""
         if not os.path.exists('data/'):
             self.create_data_files()
+        if not os.path.exists('img/'):
+            os.makedirs('img/')
 
         for file_name in self.DATAFILES:
             if not os.path.exists(file_name):
