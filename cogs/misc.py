@@ -83,7 +83,7 @@ class Misc:
             for cat in cats:
                 cat_cmds = self.bot.get_cog_commands(cat)
                 send.add_field(name=cat, value='{} commands'.format(
-                    str(len(cat_cmds))), inline=False)
+                    str(len(cat_cmds))), inline=True)
 
         elif len(args) == 1:
             found = [False, False]
@@ -108,7 +108,7 @@ class Misc:
                         if cmd.help is None:
                             cmd.brief = 'No help message found.'
                         send.add_field(
-                            name=cmd.name, value=cmd.brief, inline=False)
+                            name=f'❯ __{cmd.name}__', value=f'{cmd.brief}', inline=False)
                     break
 
             for cmd in all_cmds:
@@ -121,8 +121,12 @@ class Misc:
                     if not cmd.help:
                         cmd_help = 'No help message for this command...'
 
-                    send.description = '**Usage:** `{}`\n\n{}'.format(
-                        self.usage(cmd), cmd_help)
+                    cmd_aliases = ', '.join([f"`{alias}`" for alias in cmd.aliases])
+                    if cmd_aliases == '':
+                        cmd_aliases = "No aliases"
+
+                    send.description = '**Usage:** `{}`\n**Aliases:** {}\n\n{}'.format(
+                        self.usage(cmd), cmd_aliases, cmd_help)
                     break
 
             if found == [False, False]:
