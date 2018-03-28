@@ -24,11 +24,12 @@ class Utility:
             image = Image.open(requests.get(image_url, stream=True).raw)
         except OSError:
             await self.bot.send(ctx, ":warning: I couldn't find an image at that URL!")
+            return
 
         blurred_image = image.filter(ImageFilter.BLUR)
-        blurred_image.save(f'img/blur.png')
+        blurred_image.save('img/blur.png')
 
-        await ctx.send(file=discord.File(f'img/blur.png'))
+        await ctx.send(file=discord.File('img/blur.png'))
 
     @commands.command()
     async def emote(self, ctx, *, emote: str):
