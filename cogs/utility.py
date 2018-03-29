@@ -50,7 +50,7 @@ class Utility:
         to_send.set_thumbnail(url=image)
         to_send.description = f'[Click here for song lyrics]({song_url})'
 
-        
+        await self.bot.send(ctx, embed=to_send)    
 
     @commands.command()
     @commands.cooldown(1, 30.0, commands.BucketType.guild)
