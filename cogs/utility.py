@@ -15,6 +15,28 @@ class Utility:
         self.weather_obj = Weather(unit=Unit.CELSIUS)
 
     @commands.command()
+    async def lyrics(self, ctx, *, song_name: str):
+        """Gets the lyrics of a song."""
+        search_term = '%20'.join(song_name.split())
+        request_url = f'https://api.genius.com/search?q={search_term}'
+
+        auth_token = self.bot.config['genius_token']
+        headers = {
+            'Authorization': f'Bearer {auth_token}'
+        }
+
+        res = None
+        try:
+            res = requests.get(request_url, headers=headers)
+        except:
+            await self.bot.send(ctx, (':warning: An error occured while'
+                        ' attempting to contact the Genius Lyrics API!'))
+
+        lyrics_url = res.json()[]        
+
+        
+
+    @commands.command()
     @commands.cooldown(1, 30.0, commands.BucketType.guild)
     async def blur(self, ctx, *, image_url: str):
         """Blurs an image.
