@@ -15,6 +15,7 @@ class Utility:
         self.weather_obj = Weather(unit=Unit.CELSIUS)
 
     @commands.command()
+    @commands.cooldown(1, 30.0, commands.BucketType.guild)
     async def blur(self, ctx, *, image_url: str):
         """Blurs an image.
         
@@ -32,6 +33,7 @@ class Utility:
         await ctx.send(file=discord.File('img/blur.png'))
 
     @commands.command()
+    @commands.cooldown(1, 30.0, commands.BucketType.guild)
     async def sharpen(self, ctx, *, image_url: str):
         """Sharpens an image.
         

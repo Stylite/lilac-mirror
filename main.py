@@ -130,6 +130,9 @@ class Lilac(commands.AutoShardedBot):
             pass
         elif isinstance(exception, commands.errors.CheckFailure):
             await self.send(ctx, ':warning: You don\'t have enough perms to perform that action.')
+        elif isinstance(exception, commands.CommandOnCooldown):
+            await self.send(ctx, ':timer: Command is on cooldown for'+\
+                            f' {exception.retry_after} more seconds!')
         else:
             await self.send(ctx, ':warning: An error occured! ```{err}``` This should never happen;' +
                            ' please report this to one of the developers.')

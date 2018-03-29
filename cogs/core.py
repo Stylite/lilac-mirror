@@ -6,8 +6,6 @@ import psutil
 import discord
 from discord.ext import commands
 
-from cogs.util.devnotif import DevNotif, notify_devs
-
 
 class Core:
     """Core commands"""
