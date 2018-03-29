@@ -31,8 +31,24 @@ class Utility:
         except:
             await self.bot.send(ctx, (':warning: An error occured while'
                         ' attempting to contact the Genius Lyrics API!'))
+            return
 
-        lyrics_url = res.json()[]        
+        if not res.ok:
+            await self.bot.send(ctx, (':warning: An error occured while attempting'
+                                     ' to contact the Genius Lyrics API!'))
+            return
+
+        if len(res.json()['response']['hits']) == 0:
+            await self.bot.send(ctx, (':warning: I couldn\'t find any results for that song!'))
+            return
+
+        title = res.json()['response']['hits'][0]['result']['full_title']
+        image = res.json()['response']['hits'][0]['result']['song_art_image_thumbnail_url']
+        song_url = res.json()['response']['hits'][0]['result']['url']
+
+        to_send = discord.Embed(title=title, colour=0x0f9fff)
+        to_send.set_thumbnail(url=image)
+        to_send.description = f'[Click here for song lyrics]({song_url})'
 
         
 
