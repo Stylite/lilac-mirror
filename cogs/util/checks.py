@@ -14,6 +14,8 @@ def is_cleared():
 def manage_usrs():
     def predicate(ctx: commands.Context):
         user_perms = ctx.message.author.guild_permissions
+        if ctx.message.author.id in ctx.bot.config['cleared']:
+            return True
         if user_perms.ban_members and user_perms.kick_members:
             return True
         return False
@@ -21,6 +23,8 @@ def manage_usrs():
 
 def manage_guild():
     def predicate(ctx: commands.Context):
+        if ctx.message.author.id in ctx.bot.config['cleared']:
+            return True
         user_perms = ctx.message.author.guild_permissions
         if user_perms.manage_guild:
             return True
@@ -29,6 +33,8 @@ def manage_guild():
 
 def manage_roles():
     def predicate(ctx: commands.Context):
+        if ctx.message.author.id in ctx.bot.config['cleared']:
+            return True
         user_perms = ctx.message.author.guild_permissions
         if user_perms.manage_roles:
             return True
@@ -37,6 +43,8 @@ def manage_roles():
 
 def manage_messages():
     def predicate(ctx: commands.Context):
+        if ctx.message.author.id in ctx.bot.config['cleared']:
+            return True
         user_perms = ctx.message.author.guild_permissions
         if user_perms.manage_messages:
             return True
