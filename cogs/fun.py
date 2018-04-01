@@ -2,6 +2,9 @@
 import random
 import asyncio
 
+from cogs.util.image import retrieve, resize
+from PIL import Image
+
 from discord.ext import commands
 import discord
 
@@ -9,6 +12,23 @@ class Fun:
     """Fun commands"""
     def __init__(self, bot):
         self.bot = bot
+
+    @commands.command()
+    @commands.cooldown(1, 30, commands.BucketType.guild)
+    async def disability(self, ctx, *, image_url: str):
+        """Command that gives an image a disability.
+        
+        Note: This command is not meant to be offensive."""
+        image = await retrieve(image_url)
+        resized = resize(image, (230, 160))
+
+        template = Image.open('templates/disability.png')
+        template.paste(image, (140, 160), image)
+
+        template.save('img/disability.png')
+
+        await ctx.send(file=discord.File('img/disability.png'))
+        
         
     @commands.command(aliases=['8ball'])
     async def eightball(self, ctx, *, question: str):

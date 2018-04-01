@@ -1,9 +1,10 @@
 #!/usr/bin/env python
-import requests
-
 from weather import Weather, Unit
 from PIL import Image, ImageFilter
 import googletrans
+import aiohttp
+
+from cogs.util.image import retrieve, resize
 
 from discord.ext import commands
 import discord
@@ -26,25 +27,29 @@ class Utility:
         }
 
         res = None
+        json_resp = None
         try:
-            res = requests.get(request_url, headers=headers)
+            async with ctx.message.channel.typing():
+                with aiohttp.ClientSession() as session:
+                    res = await session.get(request_url, headers=headers)
+                    json_resp = await res.json()
         except:
             await self.bot.send(ctx, (':warning: An error occured while'
                         ' attempting to contact the Genius Lyrics API!'))
             return
 
-        if not res.ok:
+        if not 200 <= res.status < 300:
             await self.bot.send(ctx, (':warning: An error occured while attempting'
                                      ' to contact the Genius Lyrics API!'))
             return
 
-        if len(res.json()['response']['hits']) == 0:
+        if len(json_resp['response']['hits']) == 0:
             await self.bot.send(ctx, (':warning: I couldn\'t find any results for that song!'))
             return
 
-        title = res.json()['response']['hits'][0]['result']['full_title']
-        image = res.json()['response']['hits'][0]['result']['song_art_image_thumbnail_url']
-        song_url = res.json()['response']['hits'][0]['result']['url']
+        title = json_resp['response']['hits'][0]['result']['full_title']
+        image = json_resp['response']['hits'][0]['result']['song_art_image_thumbnail_url']
+        song_url = json_resp['response']['hits'][0]['result']['url']
 
         to_send = discord.Embed(title=title, colour=0x0f9fff)
         to_send.set_thumbnail(url=image)
@@ -58,12 +63,7 @@ class Utility:
         """Blurs an image.
         
         Image URL must be a valid url the bot can get an image from."""
-        image = None
-        try:
-            image = Image.open(requests.get(image_url, stream=True).raw)
-        except OSError:
-            await self.bot.send(ctx, ":warning: I couldn't find an image at that URL!")
-            return
+        image = await retrieve(image_url)
 
         blurred_image = image.filter(ImageFilter.BLUR)
         blurred_image.save('img/blur.png')
@@ -76,12 +76,7 @@ class Utility:
         """Sharpens an image.
         
         Image URL must be a valid url the bot can get an image from."""
-        image = None
-        try:
-            image = Image.open(requests.get(image_url, stream=True).raw)
-        except OSError:
-            await self.bot.send(ctx, ":warning: I couldn't find an image at that URL!")
-            return
+        image = await retrieve(image_url)
 
         sharpened_image = image.filter(ImageFilter.SHARPEN)
         sharpened_image.save('img/sharpen.png')

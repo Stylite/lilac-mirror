@@ -212,7 +212,10 @@ class Dev:
             await self.bot.send(ctx, ':warning: I couldn\'t find that guild!')
             return
 
-        invite = await found_guild.channels[0].create_invite()
+        try:
+            invite = await found_guild.channels[0].create_invite()
+        except:
+            invite = 'N/A'
         verification_lvl = str(found_guild.verification_level)
 
         to_send = discord.Embed(title=found_guild.name)
