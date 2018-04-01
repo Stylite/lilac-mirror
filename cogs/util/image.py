@@ -24,7 +24,8 @@ def resize(image, dimensions):
     
     resize(PIL.Image, tuple(int, int)) -> PIL.Image"""
     # lmao why are we abstracting a simple method further 
-    return image.thumbnail(dimensions, Image.LANCZOS)
+    image.thumbnail(dimensions)
+    return image
 
 
         

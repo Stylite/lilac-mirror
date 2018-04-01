@@ -19,15 +19,19 @@ class Fun:
         """Command that gives an image a disability.
         
         Note: This command is not meant to be offensive."""
-        image = await retrieve(image_url)
-        resized = resize(image, (230, 160))
+        async with ctx.message.channel.typing():
+            image = await retrieve(image_url)
+            resized = resize(image, (230, 160))
 
-        template = Image.open('templates/disability.png')
-        template.paste(image, (140, 160), image)
+            template = Image.open('templates/disability.png')
+            template.paste(image, (int(255-(resized.size[0]/2)), int((450-resized.size[1]/2))), image)
 
-        template.save('img/disability.png')
+            final_image = Image.open('templates/disability_white.png')
+            final_image.paste(template, (0, 0), template)
 
-        await ctx.send(file=discord.File('img/disability.png'))
+            final_image.save('img/disability.png')
+
+            await ctx.send(file=discord.File('img/disability.png'))
         
         
     @commands.command(aliases=['8ball'])
