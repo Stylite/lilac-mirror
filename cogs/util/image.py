@@ -17,7 +17,7 @@ async def retrieve(url):
     except OSError:
         raise OSError
 
-    return image
+    return image.convert('RGBA')
 
 def resize(image, dimensions):
     """Resizes an image.

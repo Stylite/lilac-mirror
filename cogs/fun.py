@@ -23,10 +23,10 @@ class Fun:
             image = await retrieve(image_url)
             resized = resize(image, (230, 160))
 
-            template = Image.open('templates/disability.png')
+            template = Image.open('templates/disability.png').convert('RGBA')
             template.paste(image, (int(255-(resized.size[0]/2)), int((450-resized.size[1]/2))), image)
 
-            final_image = Image.open('templates/disability_white.png')
+            final_image = Image.open('templates/disability_white.png').convert('RGBA')
             final_image.paste(template, (0, 0), template)
 
             final_image.save('img/disability.png')
