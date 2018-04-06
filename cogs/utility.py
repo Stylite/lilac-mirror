@@ -16,8 +16,8 @@ class Utility:
         self.weather_obj = Weather(unit=Unit.CELSIUS)
 
     @commands.command()
-    async def lyrics(self, ctx, *, song_name: str):
-        """Gets the lyrics of a song."""
+    async def song(self, ctx, *, song_name: str):
+        """Gets info about a song."""
         search_term = '%20'.join(song_name.split())
         request_url = f'https://api.genius.com/search?q={search_term}'
 
@@ -32,7 +32,7 @@ class Utility:
             async with ctx.message.channel.typing():
                 with aiohttp.ClientSession() as session:
                     res = await session.get(request_url, headers=headers)
-                    json_resp = await res.json()
+                    search_json_resp = await res.json()
         except:
             await self.bot.send(ctx, (':warning: An error occured while'
                         ' attempting to contact the Genius Lyrics API!'))
@@ -43,17 +43,46 @@ class Utility:
                                      ' to contact the Genius Lyrics API!'))
             return
 
-        if len(json_resp['response']['hits']) == 0:
+        if len(search_json_resp['response']['hits']) == 0:
             await self.bot.send(ctx, (':warning: I couldn\'t find any results for that song!'))
             return
 
-        title = json_resp['response']['hits'][0]['result']['full_title']
-        image = json_resp['response']['hits'][0]['result']['song_art_image_thumbnail_url']
-        song_url = json_resp['response']['hits'][0]['result']['url']
+        try:
+            async with ctx.message.channel.typing():
+                with aiohttp.ClientSession() as session:
+                    res = await session.get(f'https://api.genius.com/{search_json_resp["api_path"]}',\
+                                             headers=headers)
+                    json_resp = await res.json()
+        except:
+            await self.bot.send(ctx, (':warning: An error occured while'
+                        ' attempting to contact the Genius Lyrics API!'))
+            return
 
-        to_send = discord.Embed(title=title, colour=0x0f9fff)
-        to_send.set_thumbnail(url=image)
-        to_send.description = f'[Click here for song lyrics]({song_url})'
+        if res.status == 404:
+            await self.bot.send(ctx, ':warning: I couldn\'t find any results for that song!')
+            return
+
+        song_json = json_resp['response']['song']
+
+        song_info = {
+            'title': song_json['title'],
+            'artist': song_json['primary_artist']['name'],
+            'songwriters': ', '.join(writer['name'] for writer in song_json['writer_artists']),
+            'release_date': song_json['release_date'],
+            'song_url': song_json['url'],
+            'image': song_json['song_art_image_thumbnail_url'],
+        }
+
+        for s_info in song_info:
+            if not song_info[s_info] or len(song_info[s_info]) == 0:
+                song_info[s_info] = 'Not found'
+
+        to_send = discord.Embed(title=song_info['title'], colour=0x0f9fff)
+        to_send.set_thumbnail(url=song_info['image'])
+        to_send.add_field(name='Artist', value=song_info['artist'])
+        to_send.add_field(name='Songwriters', value=song_info['songwriters'])
+        to_send.add_field(name='Release Date', value=song_info['release_date'])
+        to_send.add_field(name='Lyrics', value=f'[Click here for song lyrics]({song_info["song_url"]})')
 
         await self.bot.send(ctx, embed=to_send)    
 
