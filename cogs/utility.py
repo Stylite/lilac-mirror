@@ -33,7 +33,8 @@ class Utility:
                 with aiohttp.ClientSession() as session:
                     res = await session.get(request_url, headers=headers)
                     search_json_resp = await res.json()
-        except:
+        except Exception as e:
+            print(e)
             await self.bot.send(ctx, (':warning: An error occured while'
                         ' attempting to contact the Genius Lyrics API!'))
             return
@@ -50,10 +51,14 @@ class Utility:
         try:
             async with ctx.message.channel.typing():
                 with aiohttp.ClientSession() as session:
-                    res = await session.get(f'https://api.genius.com/{search_json_resp["api_path"]}',\
+                    song_endpoint = 'https://api.genius.com'+\
+                                f'{search_json_resp["response"]["hits"][0]["result"]["api_path"]}'
+                    print(song_endpoint)
+                    res = await session.get(song_endpoint, \
                                              headers=headers)
                     json_resp = await res.json()
-        except:
+        except Exception as e:
+            print(str(e))
             await self.bot.send(ctx, (':warning: An error occured while'
                         ' attempting to contact the Genius Lyrics API!'))
             return
@@ -62,6 +67,7 @@ class Utility:
             await self.bot.send(ctx, ':warning: I couldn\'t find any results for that song!')
             return
 
+        print(json_resp)
         song_json = json_resp['response']['song']
 
         song_info = {
@@ -80,7 +86,7 @@ class Utility:
         to_send = discord.Embed(title=song_info['title'], colour=0x0f9fff)
         to_send.set_thumbnail(url=song_info['image'])
         to_send.add_field(name='Artist', value=song_info['artist'])
-        to_send.add_field(name='Songwriters', value=song_info['songwriters'])
+        to_send.add_field(name='Songwriters', value=song_info['songwriters'], inline=False)
         to_send.add_field(name='Release Date', value=song_info['release_date'])
         to_send.add_field(name='Lyrics', value=f'[Click here for song lyrics]({song_info["song_url"]})')
 
