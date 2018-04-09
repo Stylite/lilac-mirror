@@ -16,6 +16,6 @@ async def send(destination, *args, **kwargs):
         to_send.colour = 0xbd8cbf
         to_send.description = args[0]
 
-    await destination.send(embed=to_send)
-
+    message = await destination.send(embed=to_send)
+    return message
         

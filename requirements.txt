@@ -4,3 +4,4 @@ psutil
 googletrans
 weather-api
 Pillow
+emoji
