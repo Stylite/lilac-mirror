@@ -77,5 +77,8 @@ class Plants:
         await self.bot.send(ctx, f":white_check_mark: I've planted a {plant}"+\
                             f' for you with name **{plant_name}**!')
 
+        self.bot.database.commit()
+        dbcur.close()
+
 def setup(bot):
     bot.add_cog(Plants(bot))
