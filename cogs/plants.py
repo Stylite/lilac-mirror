@@ -55,14 +55,14 @@ class Plants:
         try:
             reaction, user = await self.bot.wait_for('reaction_add', timeout=30.0, check=check)
         except asyncio.TimeoutError:
-            await self.bot.send('Canceled plant purchase.')
+            await self.bot.send(ctx, 'Canceled plant purchase.')
             dbcur.close()
             return
         else:
             if reaction.emoji == '✅':
                 pass
             else:
-                await self.bot.send('Canceled plant purchase.')
+                await self.bot.send(ctx, 'Canceled plant purchase.')
                 dbcur.close()
                 return
         
