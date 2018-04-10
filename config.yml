@@ -1,4 +1,16 @@
-cleared: [255188888400822272, 260278740162969611]
-cogs: [cogs.core, cogs.mod, cogs.misc, cogs.fun, cogs.dev, cogs.economy, cogs.utility, cogs.plants]
-token: NDA1MjMxNTg1MDUxNDEwNDQy.DUhY2Q.WqFzm_weRWsV6tweG0hUN_ug_bo
+cleared: 
+  - 255188888400822272 
+  - 260278740162969611
+  
+cogs: 
+  - cogs.core 
+  - cogs.mod 
+  - cogs.misc 
+  - cogs.fun 
+  - cogs.dev 
+  - cogs.economy 
+  - cogs.utility 
+  - cogs.planting
+
+token: NDA1MjMxNTg1MDUxNDEwNDQy.Da1XSw.NAYFEKWZ8JxuWlZPNLfnIf-qXEg
 genius_token: CsbMzq31oUpS0EvmpT0OfRmFfHewoHdlszeZ16uS2GGQiyIpeuD7iM1ZbDhn6PCe

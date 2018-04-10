@@ -88,8 +88,26 @@ class Misc:
         elif len(args) == 1:
             found = [False, False]
             search_term = args[0]
+            for cmd in all_cmds:
+                if cmd.name.lower() == search_term.lower():
+                    found[1] = True
+
+                    send.title = 'Help for command `{}`'.format(cmd.name)
+
+                    cmd_help = cmd.help
+                    if not cmd.help:
+                        cmd_help = 'No help message for this command...'
+
+                    cmd_aliases = ', '.join([f"`{alias}`" for alias in cmd.aliases])
+                    if cmd_aliases == '':
+                        cmd_aliases = "No aliases"
+
+                    send.description = '**Usage:** `{}`\n**Aliases:** {}\n\n{}'.format(
+                        self.usage(cmd), cmd_aliases, cmd_help)
+                    break
+
             for cat in cats:
-                if search_term.lower() in cat.lower():
+                if search_term.lower() == cat.lower() and not found[1]:
                     if cat.lower() == 'Dev':
                         if ctx.message.author.id not in self.bot.config['cleared']:
                             return
@@ -109,24 +127,6 @@ class Misc:
                             cmd.brief = 'No help message found.'
                         send.add_field(
                             name=f'❯ __{cmd.name}__', value=f'{cmd.brief}', inline=False)
-                    break
-
-            for cmd in all_cmds:
-                if cmd.name.lower() == search_term.lower():
-                    found[1] = True
-
-                    send.title = 'Help for command `{}`'.format(cmd.name)
-
-                    cmd_help = cmd.help
-                    if not cmd.help:
-                        cmd_help = 'No help message for this command...'
-
-                    cmd_aliases = ', '.join([f"`{alias}`" for alias in cmd.aliases])
-                    if cmd_aliases == '':
-                        cmd_aliases = "No aliases"
-
-                    send.description = '**Usage:** `{}`\n**Aliases:** {}\n\n{}'.format(
-                        self.usage(cmd), cmd_aliases, cmd_help)
                     break
 
             if found == [False, False]:
