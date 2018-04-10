@@ -34,7 +34,9 @@ class Planting:
 
     @commands.command()
     async def plant(self, ctx, plant, *, plant_name):
-        """Plants a plant."""
+        """Plants a plant.
+        
+        The <plant> arg must be a single Unicode emoji."""
         user = ctx.message.author
         if len(plant) > 1:
             await self.bot.send(ctx, ':warning: You must choose a single emoji for your plant!')
@@ -117,7 +119,10 @@ class Planting:
 
     @commands.command()
     async def water(self, ctx, *, plant_name: str):
-        """Waters one of your plants."""
+        """Waters one of your plants.
+        
+        This will increase the health of your plant
+        by 1."""
         user = ctx.message.author 
 
         plant_found = self.find_plant(ctx, plant_name)
@@ -154,7 +159,12 @@ class Planting:
 
     @commands.command()
     async def harvest(self, ctx, *, plant_name):
-        """Harvests one of your plants."""
+        """Harvests one of your plants.
+        
+        Once you harvest your plant, it will be sold off
+        for some amount of <:lilac:419730009234866176>. However,
+        if your plant has 0 health, no one will buy it
+        and you will not gain any money."""
         user = ctx.message.author
         dbcur = self.bot.database.cursor()
 
@@ -198,6 +208,12 @@ class Planting:
 
     @commands.command()
     async def fertilize(self, ctx, *, plant_name: str):
+        """Fertilizes a plant.
+        
+        Fertilizer will cost anywhere from 40-60<:lilac:419730009234866176>.
+        Beware, as there is only a 1 in 5 change that fertilizer
+        will increase the health of your plant. It can poison your
+        plant and drop its health down."""
         user = ctx.message.author
 
         plant_found = self.find_plant(ctx, plant_name)
