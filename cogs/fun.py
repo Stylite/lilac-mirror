@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import aiohttp
 import random
 import asyncio
 
@@ -12,6 +13,36 @@ class Fun:
     """Fun commands"""
     def __init__(self, bot):
         self.bot = bot
+        self.ksoft_token = self.bot.config['ksoftsi_token']
+
+    @commands.command()
+    @commands.cooldown(1, 10, commands.BucketType.guild)
+    async def meme(self, ctx):
+        """Displays a random meme.
+        
+        Credit goes to api.ksoft.si for providing the api generating
+        these random memes."""
+        headers = {
+            'Authorization': f'Token {self.ksoft_token}'
+        }
+        async with ctx.message.channel.typing():
+            with aiohttp.ClientSession() as session:
+                resp = await session.get('https://api.ksoft.si/meme/random-meme', headers=headers)
+                if not 200 <= resp.status < 300:
+                    await self.bot.send(
+                        ctx,
+                        ':warning: An error occured while attempting to contact the API! Status Code:'+\
+                        f' `{resp.status}`'
+                    )
+                    return
+
+                json_resp = await resp.json()
+
+        to_send = discord.Embed(title=json_resp['title'], color=0x00bd96)
+        to_send.set_image(url=json_resp['image_url'])
+        to_send.description = f'[Source]({json_resp["source"]})'
+
+        await self.bot.send(ctx, embed=to_send)
 
     @commands.command()
     @commands.cooldown(1, 30, commands.BucketType.guild)
