@@ -64,8 +64,9 @@ class Planting:
         plant_price = random.randrange(50, 200)
         eco_results = dbcur.fetchall()
         if len(eco_results) == 0  or eco_results[0][0] < plant_price:
-            await self.bot.send(ctx, f':no_entry: You don\'t have enough {self.lilac}'+\
-                                ' to purchase a plant to plant!')
+            await self.bot.send(ctx, ':no_entry: You found a deal for that plant that costed'+\
+                                f' {self.lilac}**{plant_price}**, but you didn\'t have enough {self.lilac}'+\
+                                ' to afford it. Maybe try again later for a better deal...?')
             dbcur.close()
             return
         
