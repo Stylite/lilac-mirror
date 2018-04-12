@@ -88,6 +88,9 @@ class Lilac(commands.AutoShardedBot):
             self.prefixes = yaml.load(prefixes)
 
     async def get_prefix(self, message):
+        if self.config['debug']:
+            return "~"
+
         if message.guild.id in self.prefixes:
             return self.prefixes[message.guild.id]
         else:
@@ -219,7 +222,10 @@ class Lilac(commands.AutoShardedBot):
             else:
                 self.logger.log('LOAD', f'Loaded cog {cog}')
 
-        super().run(self.config['token'])
+        if self.config['debug']:
+            super().run(self.config['debug_token'])
+        else:
+            super().run(self.config['token'])
 
 
 Bot = Lilac()

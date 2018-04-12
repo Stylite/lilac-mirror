@@ -1,3 +1,5 @@
+debug: false
+
 cleared: 
   - 255188888400822272 
   - 260278740162969611
@@ -13,5 +15,6 @@ cogs:
   - cogs.planting
 
 token: NDA1MjMxNTg1MDUxNDEwNDQy.DbAcLA.knBrVzVNy4LCHprAg2As0F1mEiM
+debug_token: NDMzODEwMzU0OTY0MDA0ODY0.DbBQ5Q.MXDgHxMKrMsEosDojoywxUcZEjg
 genius_token: CsbMzq31oUpS0EvmpT0OfRmFfHewoHdlszeZ16uS2GGQiyIpeuD7iM1ZbDhn6PCe
 ksoftsi_token: 58c3b367d662bff8306d7e37a85e874803b29ac4
