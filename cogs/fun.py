@@ -1,10 +1,12 @@
 #!/usr/bin/env python
-import aiohttp
 import random
 import os
+import aiohttp
 import asyncio
 
 from cogs.util.image import retrieve, resize
+from cogs.util.misc import run_coro
+
 from PIL import Image
 
 from discord.ext import commands
@@ -39,11 +41,7 @@ class Fun:
         - `trombone`"""
         def disconnect(err):
             coro = ctx.message.guild.voice_client.disconnect()
-            fut = asyncio.run_coroutine_threadsafe(coro, self.bot.loop)
-            try:
-                fut.result()
-            except:
-                pass
+            run_coro(coro, self.bot)
 
         sound_file = None
         for sound in os.listdir('sounds'):
@@ -60,10 +58,6 @@ class Fun:
         if not ctx.message.author.voice:
             await self.bot.send(ctx, ':no_entry: You need to be in a VC to use this command!')
             return
-
-        def finish_playing(err):
-            if err:
-                print(f'Oof, an error occured while playing: `{err}`. Report to devs.')
 
         voice_channel = ctx.message.author.voice.channel    
         voice_client = await voice_channel.connect()
