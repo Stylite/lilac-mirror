@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import aiohttp
 import random
+import os
 import asyncio
 
 from cogs.util.image import retrieve, resize
@@ -14,6 +15,61 @@ class Fun:
     def __init__(self, bot):
         self.bot = bot
         self.ksoft_token = self.bot.config['ksoftsi_token']
+
+    @commands.command(aliases=['sb'])
+    @commands.cooldown(1, 15, commands.BucketType.guild)
+    async def soundboard(self, ctx, *, sound_effect: str):
+        """Plays a sound!
+        
+        The current available sounds are:
+        - `airhorn`
+        - `deeznuts`
+        - `drumroll`
+        - `easy`
+        - `err`
+        - `falconpunch`
+        - `fart`
+        - `inception`
+        - `leeroy`
+        - `lightsaber`
+        - `omaewa`
+        - `oof`
+        - `order66`
+        - `sax`
+        - `trombone`"""
+        def disconnect(err):
+            coro = ctx.message.guild.voice_client.disconnect()
+            fut = asyncio.run_coroutine_threadsafe(coro, self.bot.loop)
+            try:
+                fut.result()
+            except:
+                pass
+
+        sound_file = None
+        for sound in os.listdir('sounds'):
+            if sound_effect.lower() == sound.split('.')[0]:
+                sound_file = f'sounds/{sound}'
+                break
+        else:
+            await self.bot.send(ctx, ':warning: I couldn\'t find that sound effect!')
+            return
+
+        if ctx.message.guild.me.voice:
+            await ctx.message.guild.voice_client.disconnect()
+
+        if not ctx.message.author.voice:
+            await self.bot.send(ctx, ':no_entry: You need to be in a VC to use this command!')
+            return
+
+        def finish_playing(err):
+            if err:
+                print(f'Oof, an error occured while playing: `{err}`. Report to devs.')
+
+        voice_channel = ctx.message.author.voice.channel    
+        voice_client = await voice_channel.connect()
+        voice_client.play(discord.FFmpegPCMAudio(sound_file), after=disconnect)
+
+        await ctx.message.add_reaction('✅')
 
     @commands.command()
     @commands.cooldown(1, 10, commands.BucketType.guild)

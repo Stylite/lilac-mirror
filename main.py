@@ -15,7 +15,6 @@ import discord
 
 """Main source file for Lilac -- run this to start the bot."""
 
-
 class Lilac(commands.AutoShardedBot):
     """Bot class for Lilac."""
 
