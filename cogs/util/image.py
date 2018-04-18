@@ -6,7 +6,7 @@ from PIL import Image, ImageFilter
 import discord
 
 async def retrieve(url):
-    """Retrieves an image from a IRL.
+    """Retrieves an image from a URL.
     
     retrieve(string) -> PIL.Image"""
     image = None

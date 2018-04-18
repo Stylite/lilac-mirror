@@ -5,7 +5,7 @@ import aiohttp
 import asyncio
 
 from cogs.util.image import retrieve, resize
-from cogs.util.misc import run_coro
+from cogs.util.misc import run_coro, unsplash_api_request
 
 from PIL import Image
 
@@ -150,6 +150,26 @@ class Fun:
         await self.bot.send(ctx, 'The Magic 8 Ball is spinning...')
         await asyncio.sleep(1)
         await self.bot.send(ctx, ':8ball: **The Magic 8 Ball says:** ```{}```'.format(choice))
+
+    @commands.command()
+    async def hug(self, ctx, *, user_mention: str):
+        """Gives a big ol huggo to another user."""
+        mentioned = ctx.message.mentions
+        if len(mentioned) > 0:
+            to_hug = mentioned[0]
+        else:
+            await self.bot.send(ctx, ':warning: You must mention a user to hug!')
+        
+        to_send = discord.Embed(description=f':hugging: **{ctx.message.author.name}** gives a big ol\''+\
+                                f' hug to **{to_hug.name}**!', colour=0xbd8cbf)
+
+        hug_image = await unsplash_api_request('hug')
+        if not hug_image:
+            hug_image=''
+        
+        to_send.set_image(url=hug_image)
+
+        await self.bot.send(ctx, embed=to_send)
         
 def setup(bot):
     bot.add_cog(Fun(bot))
