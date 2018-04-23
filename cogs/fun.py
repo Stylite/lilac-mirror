@@ -159,6 +159,7 @@ class Fun:
             to_hug = mentioned[0]
         else:
             await self.bot.send(ctx, ':warning: You must mention a user to hug!')
+            return
         
         to_send = discord.Embed(description=f':hugging: **{ctx.message.author.name}** gives a big ol\''+\
                                 f' hug to **{to_hug.name}**!', colour=0xbd8cbf)
