@@ -20,6 +20,18 @@ class Dev:
 
     @commands.command()
     @is_cleared()
+    async def sql(self, ctx, *, code: str):
+        """Executes SQL on the database. Very dangerous."""
+        dbcur = self.bot.database.cursor()
+        dbcur.execute(code)
+        res = dbcur.fetchall()
+        self.bot.database.commit()
+        dbcur.close()
+
+        await self.bot.send(ctx, f':white_check_mark: Executed. ```{res}```')
+
+    @commands.command()
+    @is_cleared()
     async def reload(self, ctx, *, cog):
         """Reloads a cog of the bot. 
 

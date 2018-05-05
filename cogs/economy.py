@@ -11,7 +11,7 @@ class Economy:
     """Economy commands"""
     def __init__(self, bot):
         self.bot = bot
-        self.lilac = '<:lilac:419730009234866176>'
+        self.lilac = '<:lilac:423738882710962176>'
 
         dbcur = self.bot.database.cursor()
         dbcur.execute('''
