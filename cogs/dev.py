@@ -214,15 +214,17 @@ class Dev:
 
         try:
             invite = await found_guild.channels[0].create_invite()
+            invite = invite.url
         except:
             invite = 'N/A'
+        
         verification_lvl = str(found_guild.verification_level)
 
         to_send = discord.Embed(title=found_guild.name)
         to_send.colour = 0xbd8cbf
         to_send.set_thumbnail(url=found_guild.icon_url)
         to_send.add_field(name='Owner', value=str(found_guild.owner))
-        to_send.add_field(name='Invite Link', value=invite.url)
+        to_send.add_field(name='Invite Link', value=invite)
         to_send.add_field(name='# of Members', value=len(found_guild.members))
         to_send.add_field(name='# of Channels', value=len(found_guild.channels))
         to_send.add_field(name='Verification Level', value=str(verification_lvl))
