@@ -4,4 +4,5 @@ psutil
 googletrans
 weather-api
 Pillow
+matplotlib
 emoji

@@ -15,6 +15,9 @@ import discord
 
 """Main source file for Lilac -- run this to start the bot."""
 
+class Emotes:
+    xmark = '<:cross:437236812109316109>'
+
 class Lilac(commands.AutoShardedBot):
     """Bot class for Lilac."""
 
@@ -33,6 +36,7 @@ class Lilac(commands.AutoShardedBot):
         sys.stdout = self.logger
         
         self.send = sender_module.send
+        self.emotes = Emotes()
 
         self.up_at = time.time()
 

@@ -1,6 +1,9 @@
 #!/usr/bin/env python
+import os
 from weather import Weather, Unit
 from PIL import Image, ImageFilter
+import matplotlib.pyplot as plot
+from matplotlib.gridspec import GridSpec
 import googletrans
 import aiohttp
 
@@ -117,6 +120,32 @@ class Utility:
         sharpened_image.save('img/sharpen.png')
 
         await ctx.send(file=discord.File('img/sharpen.png'))
+
+    @commands.command()
+    @commands.cooldown(1, 60.0, commands.BucketType.guild)
+    async def pieplot(self, ctx, *, data):
+        """Makes a nice pieplot with labels and values.
+        
+        Seperate the labels and values with `:`, and seperate the different 
+        labels and values with `|`. Values must be numbers.
+        
+        Examples:
+        `pieplot Trump:400|Clinton:400`
+        `pieplot Dogs:1000|Cats:1220|Birds:400`"""
+        labels = [v.split(':')[0] for v in data.split('|')]
+        try:
+            values = [float(v.split(':')[1]) for v in data.split('|')]
+        except ValueError:
+            await self.bot.send(ctx, f'{self.bot.emotes.xmark}'+\
+                                ' All of the values provided must be numbers.')
+            return
+
+        grid = GridSpec(1, 1)
+        plot.subplot(grid[0,0], aspect=1)
+        plot.pie(values, labels=labels, radius=1)
+        plot.savefig('img/pieplot.png')
+
+        await ctx.send(file=discord.File('img/pieplot.png'))
 
     @commands.command()
     async def emote(self, ctx, *, emote: str):
