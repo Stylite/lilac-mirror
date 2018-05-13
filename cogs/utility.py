@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 import os
+import numpy as np
+
 from weather import Weather, Unit
 from PIL import Image, ImageFilter
 import matplotlib.pyplot as plot
@@ -128,11 +130,11 @@ class Utility:
         
         Put the title before the data. Title must not contain spaces.
 
-        _**In the data:**__
+        **In the data:**
         Seperate the labels and values with `:`, and seperate the different 
         labels and values with `|`. Values must be numbers.
         
-        Examples:
+        **Examples:**
         `pieplot Voting Trump:400|Clinton:400`
         `pieplot Pets Dogs:1000|Cats:1220|Birds:400`"""
         labels = [v.split(':')[0] for v in data.split('|')]
@@ -150,6 +152,42 @@ class Utility:
         plot.savefig('img/pieplot.png')
 
         await ctx.send(file=discord.File('img/pieplot.png'))
+
+    @commands.command()
+    @commands.cooldown(1, 15.0, commands.BucketType.guild)
+    async def bargraph(self, ctx, title: str, ylabel: str, *, data: str):
+        """Makes a bargraph.
+        
+        Put the title and yaxis label before the data. Title must not contain spaces.
+
+        **In the data:**
+        Seperate the labels and values with `:`, and seperate the different 
+        labels and values with `|`. Values must be numbers.
+        
+        **Example:**
+        `bargraph ServerUptime Hours Server 1:50|Server 2:30`"""
+        labels = [v.split(':')[0] for v in data.split('|')]
+        try:
+            values = [float(v.split(':')[1]) for v in data.split('|')]
+        except ValueError:
+            await self.bot.send(ctx, f'{self.bot.emotes.xmark}'+\
+                                ' All of the values provided must be numbers.')
+            return
+
+        fig, ax = plot.subplots()
+        ind = np.arange(1, len(values)+1)
+
+        plot.bar(ind, values)
+        ax.set_xticks(ind)
+        ax.set_xticklabels(labels)
+        ax.set_title(title)
+        ax.set_ylim([0, max(values)+10])
+        ax.set_ylabel(ylabel)
+
+        plot.savefig('img/bargraph.png')
+
+        await ctx.send(file=discord.File('img/bargraph.png'))
+
 
     @commands.command()
     async def emote(self, ctx, *, emote: str):
