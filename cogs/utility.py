@@ -122,16 +122,19 @@ class Utility:
         await ctx.send(file=discord.File('img/sharpen.png'))
 
     @commands.command()
-    @commands.cooldown(1, 60.0, commands.BucketType.guild)
-    async def pieplot(self, ctx, *, data):
-        """Makes a nice pieplot with labels and values.
+    @commands.cooldown(1, 15.0, commands.BucketType.guild)
+    async def pieplot(self, ctx, title, *, data):
+        """Makes a nice pieplot with labels and values and a title.
         
+        Put the title before the data. Title must not contain spaces.
+
+        _**In the data:**__
         Seperate the labels and values with `:`, and seperate the different 
         labels and values with `|`. Values must be numbers.
         
         Examples:
-        `pieplot Trump:400|Clinton:400`
-        `pieplot Dogs:1000|Cats:1220|Birds:400`"""
+        `pieplot Voting Trump:400|Clinton:400`
+        `pieplot Pets Dogs:1000|Cats:1220|Birds:400`"""
         labels = [v.split(':')[0] for v in data.split('|')]
         try:
             values = [float(v.split(':')[1]) for v in data.split('|')]
@@ -142,6 +145,7 @@ class Utility:
 
         grid = GridSpec(1, 1)
         plot.subplot(grid[0,0], aspect=1)
+        plot.title(title)
         plot.pie(values, labels=labels, radius=1)
         plot.savefig('img/pieplot.png')
 
