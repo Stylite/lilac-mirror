@@ -567,7 +567,7 @@ class Mod:
 
         await self.bot.send(ctx, f':white_check_mark: Changed this guild\'s prefix to `{new_prefix}`')
 
-    @commands.command()
+    @commands.command(aliases=['clear'])
     @manage_messages()
     async def purge(self, ctx, *, number: int):
         """Purges a number of messages.
@@ -577,13 +577,7 @@ class Mod:
             await self.bot.send(ctx, ':warning: I can only purge between 1 and 100 messages!') 
             return
         
-        async for message in ctx.message.channel.history(limit=number):
-            await message.delete()
-            await asyncio.sleep(0.2)
-
-        notif_msg = await self.bot.send(ctx, f':white_check_mark: I\'ve purged {number} messages for you!')
-        await asyncio.sleep(7.0)
-        await notif_msg.delete()
+        await ctx.channel.purge(limit=number+1, bulk=True)
 
 def setup(bot):
     bot.add_cog(Mod(bot))
