@@ -26,6 +26,10 @@ class Mod:
         dbcur.execute('''
             CREATE TABLE IF NOT EXISTS
             goodbyes(guild_id INTEGER, message TEXT, channel_id INTEGER)''')
+        dbcur.execute('''
+            CREATE TABLE IF NOT EXISTS
+            logs(guild_id INTEGER, channel_id INTEGER)''')        
+        
         self.bot.database.commit()
         dbcur.close()
 
@@ -578,6 +582,69 @@ class Mod:
             return
         
         await ctx.channel.purge(limit=number+1, bulk=True)
+
+    @commands.group(aliases=['modlog'])
+    @manage_guild()
+    async def log(self, ctx):
+        if ctx.invoked_subcommand is None:
+            await ctx.send("WIP")
+
+    @log.command()
+    @manage_guild()
+    async def enable(self, ctx):
+        guild = ctx.message.guild
+
+        dbcur = self.bot.database.cursor()
+        dbcur.execute(f'SELECT * FROM logs WHERE guild_id={guild.id}')
+        if len(dbcur.fetchall()) > 0:
+            await self.bot.send(ctx, f'{self.bot.emotes.xmark} Your guild already has modlogs enabled!')
+            return
+
+        dbcur.execute(f'INSERT INTO logs(guild_id, channel_id) VALUES ({guild.id}, null)')
+        self.bot.database.commit()
+        dbcur.close()
+
+        await self.bot.send(ctx, f'{self.bot.emotes.check} Enabled logs for this guild.')
+
+    @log.command()
+    @manage_guild()
+    async def disable(self, ctx):
+        guild = ctx.message.guild
+
+        dbcur = self.bot.database.cursor()
+        dbcur.execute(f'SELECT * FROM logs WHERE guild_id={guild.id}')
+        if len(dbcur.fetchall()) == 0:
+            await self.bot.send(ctx, f'{self.bot.emotes.xmark} Your guild does not have modlogs enabled!')
+            return
+
+        dbcur.execute(f'DELETE FROM logs WHERE guild_id={guild.id}')
+        self.bot.database.commit()
+        dbcur.close()
+
+        await self.bot.send(ctx, f'{self.bot.emotes.check} Disabled logs for this guild.')
+
+    @log.command()
+    @manage_guild()
+    async def channel(self, ctx, *, channel_mention: str):
+        if not ctx.message.channel_mentions:
+            await self.bot.send(ctx, f'{self.bot.emotes.xmark} You must mention a channel for modlogs.')
+            return
+        channel = ctx.message.channel_mentions[0]
+        guild = ctx.message.guild
+        
+        dbcur = self.bot.database.cursor()
+        dbcur.execute(f'SELECT * FROM logs WHERE guild_id={guild.id}')
+        if len(dbcur.fetchall()) == 0:
+            await self.bot.send(ctx, f'{self.bot.emotes.xmark} Your guild must have modlogs'+\
+                                ' enabled before setting the log channel.')
+            return
+        
+        dbcur.execute(f'UPDATE logs SET channel_id={channel.id} WHERE guild_id={guild.id}')
+        self.bot.database.commit()
+        dbcur.close()
+
+        await self.bot.send(ctx, f'{self.bot.emotes.check} Set {channel.mention} as this'+\
+                            ' guild\'s modlog channel.')
 
 def setup(bot):
     bot.add_cog(Mod(bot))
