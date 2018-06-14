@@ -5,6 +5,18 @@ class Events:
     def __init__(self, bot):
         self.bot = bot
 
+    async def on_message_delete(self, msg):
+        await self.bot.loghandler.handle_event('message_delete', msg)
+
+    async def on_message_edit(self, old_msg, new_msg):
+        await self.bot.loghandler.handle_event('message_edit', [old_msg, new_msg])
+
+    async def on_guild_channel_create(self, channel):
+        await self.bot.loghandler.handle_event('guild_channel_create', channel)
+
+    async def on_guild_channel_delete(self, channel):
+        await self.bot.loghandler.handle_event('guild_channel_delete', channel)
+
     async def on_member_join(self, member):
         """on_member_join event; handle welcome messages and autoroles"""
         # handle welcome messages
@@ -34,6 +46,8 @@ class Events:
 
         dbcur.close()
 
+        await self.bot.loghandler.handle_event('member_join', member)
+
     async def on_member_remove(self, member):
         """on_member_remove event; handle goodbye messages"""
         dbcur = self.bot.database.cursor()
@@ -54,6 +68,8 @@ class Events:
             await goodbye_channel.send(fmt_goodbye_message)
             
         dbcur.close()
+
+        await self.bot.loghandler.handle_event('member_remove', member)
 
 def setup(bot):
     events = Events(bot)

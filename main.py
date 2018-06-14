@@ -8,6 +8,7 @@ import traceback
 import yaml
 
 from cogs.util.logging import Logger
+from cogs.util.modlogs import ModlogHandler
 import cogs.util.sender as sender_module
 
 from discord.ext import commands
@@ -38,6 +39,7 @@ class Lilac(commands.AutoShardedBot):
         
         self.send = sender_module.send
         self.emotes = Emotes()
+        self.loghandler = ModlogHandler(self)
 
         self.up_at = time.time()
 
