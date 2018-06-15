@@ -106,16 +106,14 @@ class Dev:
             pull_process = await asyncio.create_subprocess_exec('git', 'pull', 'origin', 'master',
                                                                  stdout=subprocess.PIPE, \
                                                                  stderr=subprocess.PIPE)
-            output = pull_process.stdout
-            outerr = pull_process.stderr
+            output, outerr = await pull_process.communicate()
 
         output = '+ ' + '\n+ '.join(output.decode().splitlines())
-        print(output)
-        print(outerr)
         if not outerr is None:
             outerr = '- ' + '\n- '.join(outerr.decode().splitlines())
         else:
             outerr = ''
+            
         await self.bot.send(ctx, f'**Git Response:** ```diff\n{output}{outerr}```')
 
     @commands.command(aliases=['bl'])

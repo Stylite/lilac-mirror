@@ -71,6 +71,18 @@ class Events:
 
         await self.bot.loghandler.handle_event('member_remove', member)
 
+    async def on_guild_role_create(self, role):
+        await self.bot.loghandler.handle_event('guild_role_create', role)
+    
+    async def on_guild_role_delete(self, role):
+        await self.bot.loghandler.handle_event('guild_role_delete', role)
+
+    async def on_member_ban(self, guild, user):
+        await self.bot.loghandler.handle_event('member_ban', [guild, user])
+
+    async def on_member_unban(self, guild, user):
+        await self.bot.loghandler.handle_event('member_unban', [guild, user])
+
 def setup(bot):
     events = Events(bot)
 

@@ -5,6 +5,10 @@ import datetime
 class ModlogHandler(object):
     def __init__(self, bot):
         self.bot = bot
+        self.bulk_delete_cache = {}  
+        # prevent on_message_delete modlog events from firing from bulk delete
+        # probably inefficient and slow as hell but stfu and stop
+        # hurting my feelings
 
     async def send_to_modlog(self, guild, to_send: discord.Embed):
         dbcur = self.bot.database.cursor()
@@ -18,11 +22,24 @@ class ModlogHandler(object):
         await channel.send(embed=to_send)  
 
     async def handle_event(self, event, data):
-        if event == 'message_delete':
+        if event == 'raw_bulk_message_delete':
+            if data["channel_id"] in self.bulk_delete_cache:
+                self.bulk_delete_cache[data["channel_id"]].extend(data["ids"])
+            else:
+                self.bulk_delete_cache[data["channel_id"]] = data["ids"]
+            await self.bulk_message_delete(data)
+        elif event == 'message_delete':
+            if data.author.bot:
+                return
+            if data.channel.id in self.bulk_delete_cache:
+                if data.id in self.bulk_delete_cache[data.channel.id]:
+                    return
             await self.message_deleted(data)
         elif event == 'message_edit':
             if data[0].author.bot:
                 return  
+            if data[0].content == data[1].content:
+                return
             await self.message_edit(data[0], data[1])
         elif event == 'guild_channel_create':
             await self.guild_channel_create(data)
@@ -32,6 +49,17 @@ class ModlogHandler(object):
             await self.member_join(data)
         elif event == 'member_remove':
             await self.member_remove(data)
+        elif event == 'guild_role_create':
+            await self.guild_role_create(data)
+        elif event == 'guild_role_delete':
+            await self.guild_role_delete(data)
+        elif event == 'member_ban':
+            await self.member_ban(data[0], data[1])
+        elif event == 'member_unban':
+            await self.member_unban(data[0], data[1])
+
+    async def bulk_message_delete(self, payload):
+        raise NotImplementedError
 
     async def message_deleted(self, msg):
         embed = discord.Embed(title="Message Deleted", colour=0xff0000)
@@ -116,3 +144,33 @@ class ModlogHandler(object):
         embed.set_thumbnail(url=member.avatar_url)
 
         await self.send_to_modlog(member.guild, embed)
+
+    async def guild_role_create(self, role):
+        embed = discord.Embed(title="Role Created", colour=0x2ef761)
+        embed.timestamp = datetime.datetime.utcnow()
+        embed.add_field(name="Name", value=role.name)
+
+        await self.send_to_modlog(role.guild, embed)
+
+    async def guild_role_delete(self, role):
+        embed = discord.Embed(title="Role Deleted", colour=0xd1089e)
+        embed.timestamp = datetime.datetime.utcnow()
+        embed.add_field(name="Name", value=role.name)
+
+        await self.send_to_modlog(role.guild, embed)
+
+    async def member_ban(self, guild, user):
+        embed = discord.Embed(title="Member Banned", colour=0xff0000)
+        embed.set_thumbnail(url=user.avatar_url)
+        embed.timestamp = datetime.datetime.utcnow()
+        embed.add_field(name="Username", value=f'{user} ({user.mention})')
+
+        await self.send_to_modlog(guild, embed)
+
+    async def member_unban(self, guild, user):
+        embed = discord.Embed(title="Member Unbanned", colour=0xbc00ff)
+        embed.set_thumbnail(url=user.avatar_url)
+        embed.timestamp = datetime.datetime.utcnow()
+        embed.add_field(name="Username", value=f'{user} ({user.mention})')
+
+        await self.send_to_modlog(guild, embed)
