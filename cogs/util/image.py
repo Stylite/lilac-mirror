@@ -11,7 +11,7 @@ async def retrieve(url):
     retrieve(string) -> PIL.Image"""
     image = None
     try:
-        with aiohttp.ClientSession() as session:
+        async with aiohttp.ClientSession() as session:
             async with session.get(url) as r:
                 image = Image.open(BytesIO(await r.read()))
     except OSError:
