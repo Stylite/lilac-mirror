@@ -16,7 +16,7 @@ async def unsplash_api_request(query):
     body = {
         'query': query
     }
-    with aiohttp.ClientSession() as session:
+    async with aiohttp.ClientSession() as session:
         res = await session.get('https://api.unsplash.com/photos/random', params=body, headers=headers)
         json_resp = await res.json()
 

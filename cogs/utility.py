@@ -35,7 +35,7 @@ class Utility:
         json_resp = None
         try:
             async with ctx.message.channel.typing():
-                with aiohttp.ClientSession() as session:
+                async with aiohttp.ClientSession() as session:
                     res = await session.get(request_url, headers=headers)
                     search_json_resp = await res.json()
         except Exception as e:
@@ -55,7 +55,7 @@ class Utility:
 
         try:
             async with ctx.message.channel.typing():
-                with aiohttp.ClientSession() as session:
+                async with aiohttp.ClientSession() as session:
                     song_endpoint = 'https://api.genius.com'+\
                                 f'{search_json_resp["response"]["hits"][0]["result"]["api_path"]}'
                     print(song_endpoint)
