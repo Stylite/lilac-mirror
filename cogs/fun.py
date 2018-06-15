@@ -76,7 +76,7 @@ class Fun:
             'Authorization': f'Token {self.ksoft_token}'
         }
         async with ctx.message.channel.typing():
-            with aiohttp.ClientSession() as session:
+            async with aiohttp.ClientSession() as session:
                 resp = await session.get('https://api.ksoft.si/meme/random-meme', headers=headers)
                 if not 200 <= resp.status < 300:
                     await self.bot.send(
