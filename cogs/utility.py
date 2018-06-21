@@ -39,7 +39,6 @@ class Utility:
                     res = await session.get(request_url, headers=headers)
                     search_json_resp = await res.json()
         except Exception as e:
-            print(e)
             await self.bot.send(ctx, (':warning: An error occured while'
                         ' attempting to contact the Genius Lyrics API!'))
             return
@@ -58,12 +57,10 @@ class Utility:
                 async with aiohttp.ClientSession() as session:
                     song_endpoint = 'https://api.genius.com'+\
                                 f'{search_json_resp["response"]["hits"][0]["result"]["api_path"]}'
-                    print(song_endpoint)
                     res = await session.get(song_endpoint, \
                                              headers=headers)
                     json_resp = await res.json()
         except Exception as e:
-            print(str(e))
             await self.bot.send(ctx, (':warning: An error occured while'
                         ' attempting to contact the Genius Lyrics API!'))
             return
@@ -72,7 +69,6 @@ class Utility:
             await self.bot.send(ctx, ':warning: I couldn\'t find any results for that song!')
             return
 
-        print(json_resp)
         song_json = json_resp['response']['song']
 
         song_info = {
