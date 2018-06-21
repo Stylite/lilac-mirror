@@ -24,16 +24,17 @@ class Planting:
         user = ctx.message.author
 
         dbcur = self.bot.database.cursor()
-        dbcur.execute(f'SELECT * FROM plants WHERE id={user.id} AND name="{plant_name}"')
+        dbcur.execute(f'SELECT * FROM plants WHERE id={user.id}')
         plants_found = dbcur.fetchall()
+        for plant in plants_found:
+            if plant[2] == plant_name:
+                return plant
 
         if len(plants_found) == 0:
             return None
 
-        return plants_found[0]
-
-    @commands.command()
-    async def plant(self, ctx, plant, *, plant_name):
+    @commands.command(name='plant')
+    async def _plant(self, ctx, plant, *, plant_name):
         """Plants a plant.
         
         The <plant> arg must be a single Unicode emoji."""
