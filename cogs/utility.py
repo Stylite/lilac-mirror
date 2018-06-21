@@ -91,7 +91,7 @@ class Utility:
         to_send.add_field(name='Release Date', value=song_info['release_date'])
         to_send.add_field(name='Lyrics', value=f'[Click here for song lyrics]({song_info["song_url"]})')
 
-        await self.bot.send(ctx, embed=to_send)    
+        await self.bot.send(ctx, embed=to_send)
 
     @commands.command()
     @commands.cooldown(1, 30.0, commands.BucketType.guild)

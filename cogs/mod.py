@@ -586,8 +586,20 @@ class Mod:
     @commands.group(aliases=['modlog'])
     @manage_guild()
     async def log(self, ctx):
+        """Manages moderation logging.
+        
+        To enable logs, do `log enable`.
+        To set the log channel, do `log channel #channel`.
+        
+        To disable logs, do `log disable.`"""
         if ctx.invoked_subcommand is None:
-            await ctx.send("WIP")
+            hm = (
+                "Manages moderation logging.\n\n"
+                "To enable logs, do `log enable`.\n"
+                "To set the log channel, do `log channel #channel`\n\n."
+                "To disable logs, do `log disable.`"
+            )
+            await self.bot.send(ctx, hm)
 
     @log.command()
     @manage_guild()

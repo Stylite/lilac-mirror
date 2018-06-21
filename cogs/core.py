@@ -16,6 +16,11 @@ class Core:
     async def check(self, ctx):
         """Checks if the bot is up."""
         await self.bot.send(ctx, 'Bot is up and running!')
+    
+    @commands.command()
+    async def ping(self, ctx):
+        """Pong!"""
+        await self.bot.send(ctx, f':ping_pong: Pong! Websocket latency is `{round(self.bot.ws.latency)}ms`')
 
     @commands.command()
     async def feedback(self, ctx):
