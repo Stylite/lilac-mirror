@@ -20,7 +20,7 @@ class Core:
     @commands.command()
     async def ping(self, ctx):
         """Pong!"""
-        await self.bot.send(ctx, f':ping_pong: Pong! Websocket latency is `{round(self.bot.ws.latency)}ms`')
+        await self.bot.send(ctx, f':ping_pong: Pong! Websocket latency is `{round(self.bot.latency)}ms`')
 
     @commands.command()
     async def feedback(self, ctx):
