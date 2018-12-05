@@ -1,8 +1,9 @@
-debug: false
+debug: false # Change to true if you're using the debug token instead of the production one.
 
 cleared: 
-  - 255188888400822272 
-  - 260278740162969611
+  - 11111111111111111 # Use this to add the main bot owner/manager.
+  - 22222222222222222 # Use this line to add a second bot owner/manager.
+  - 33333333333333333 # In this and above sections, User IDs are placed.
   
 cogs: 
   - cogs.core 
@@ -13,8 +14,9 @@ cogs:
   - cogs.economy 
   - cogs.utility 
   - cogs.planting
+  # Cogs are the modules. If you make a new module for the bot, make sure to link it here.
 
-token: NDA1MjMxNTg1MDUxNDEwNDQy.DbAcLA.knBrVzVNy4LCHprAg2As0F1mEiM
-debug_token: NDMzODEwMzU0OTY0MDA0ODY0.DbBQ5Q.MXDgHxMKrMsEosDojoywxUcZEjg
-genius_token: CsbMzq31oUpS0EvmpT0OfRmFfHewoHdlszeZ16uS2GGQiyIpeuD7iM1ZbDhn6PCe
-ksoftsi_token: 58c3b367d662bff8306d7e37a85e874803b29ac4
+token: 123123123 # This bot token is for a production copy of the bot. Never invite this token to a public server.
+debug_token: 123123123 # This token is for a debug bot. Add this bot token only if you want to make changes to the bot's code.
+genius_token: 123123123 # This token is for adding Genius Lyrics support.
+ksoftsi_token: 123123123 # Ths token is for weather.
