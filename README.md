@@ -9,3 +9,5 @@ at any time.
   
 **Invite Link:**  
 https://discordapp.com/api/oauth2/authorize?client_id=405231585051410442&permissions=8&scope=bot  
+
+^ defunct
