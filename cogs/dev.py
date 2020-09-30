@@ -21,7 +21,7 @@ class Dev:
     @commands.command()
     @is_cleared()
     async def sql(self, ctx, *, code: str):
-        """Executes SQL on the database. Very dangerous."""
+        """Executes SQL on the database. Very safe and friendly."""
         dbcur = self.bot.database.cursor()
         dbcur.execute(code)
         res = dbcur.fetchall()
@@ -33,9 +33,7 @@ class Dev:
     @commands.command()
     @is_cleared()
     async def reload(self, ctx, *, cog):
-        """Reloads a cog of the bot. 
-
-        Developer only command."""
+        """Reloads a cog of the bot."""
         try:
             self.bot.unload_extension(cog)
             self.bot.load_extension(cog)
@@ -49,9 +47,7 @@ class Dev:
     @commands.command(aliases=['reboot'])
     @is_cleared()
     async def restart(self, ctx):
-        """Restarts the bot.
-
-        Developer only command."""
+        """Restarts the bot."""
         await self.bot.send(ctx, ':warning: Rebooting Lilac...')
         os.execl(sys.executable, sys.executable, * sys.argv)
 
@@ -64,7 +60,7 @@ class Dev:
     @commands.command(aliases=['evaluate'])
     @is_cleared()
     async def debug(self, ctx, *, code: str):
-        """Executes some code."""
+        """Executes python code."""
         try:
             env = {}
             to_exec = 'async def func(ctx):\n'
